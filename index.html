@@ -131,7 +131,8 @@ details{margin-top:8px}summary{cursor:pointer;color:var(--ac);font-weight:800}
 <script>
 (function(){
 if(window.claude&&window.claude.use)return; // inside Claude: do nothing
-const K='sn:ai',DEF={url:'https://api.openai.com/v1/chat/completions',model:'gpt-5.4-mini',key:'',effort:'low'};
+const K='sn:ai',DEF={url:'https://api.openai.com/v1/chat/completions',model:'gpt-5.4-mini',key:'',effort:'low',gap:0};
+const PROV={openai:{url:DEF.url,model:'gpt-5.4-mini',gap:0},gemini:{url:'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions',model:'gemini-2.5-flash',gap:4000},groq:{url:'https://api.groq.com/openai/v1/chat/completions',model:'llama-3.3-70b-versatile',gap:3000},openrouter:{url:'https://openrouter.ai/api/v1/chat/completions',model:'openrouter/auto',gap:1500},ollama:{url:'http://localhost:11434/v1/chat/completions',model:'llama3.1',gap:0}};
 const PRESETS=['gpt-5.4-mini','gpt-5.4','gpt-5.4-nano','gpt-5.5','gpt-5.6-terra','gpt-5.6-sol','gpt-5.6-luna'];
 const cfg=()=>{try{return Object.assign({},DEF,JSON.parse(localStorage.getItem(K)||'{}'))}catch(e){return{...DEF}}};
 const put=c=>{try{localStorage.setItem(K,JSON.stringify(c))}catch(e){}};
@@ -145,7 +146,7 @@ function settings(){
     const c=cfg(),o=document.createElement('div');o.className='ov';o.style.zIndex=80;
     o.innerHTML=`<div class="card modal"><h3 style="margin-top:0;font-weight:900">⚙️ AI settings</h3>
     <p class="mut" style="margin-top:0;font-size:14px">Paste an OpenAI API key from platform.openai.com. It is stored only in this browser.</p>
-    <label>API key</label><input id="ak" class="in" type="password" placeholder="sk-..." autocomplete="off">
+    <label>AI provider</label><select id="ap" class="in"><option value="">Custom / keep current</option><option value="openai">OpenAI (paid, highest quality)</option><option value="gemini">Google Gemini (free tier)</option><option value="groq">Groq (free tier, very fast)</option><option value="openrouter">OpenRouter (many models, some free)</option><option value="ollama">Ollama on my own computer (truly unlimited)</option></select><label>API key</label><input id="ak" class="in" type="password" placeholder="sk-..." autocomplete="off">
     <label>Model</label><input id="am2" class="in" list="aml" placeholder="gpt-5.4-mini"><datalist id="aml">${PRESETS.map(m=>`<option value="${m}">`).join('')}</datalist>
     <button class="btn alt" id="al" style="margin:-4px 0 12px;padding:7px 12px;font-size:13px">🔄 Load models available to my key</button>
     <label>Quality</label><select id="ae" class="in"><option value="none">Fastest</option><option value="low">Balanced (recommended)</option><option value="medium">Higher quality</option><option value="high">Best, slower</option></select>
@@ -154,29 +155,29 @@ function settings(){
     <div class="err" id="ar"></div>
     <div class="row" style="justify-content:flex-end"><button class="btn alt" id="ax">Cancel</button><button class="btn" id="as">Save</button></div></div>`;
     document.body.appendChild(o);const q=s=>o.querySelector(s);
-    q('#ak').value=c.key;q('#am2').value=c.model;q('#au').value=c.url;q('#ae').value=c.effort;
+    q('#ak').value=c.key;q('#am2').value=c.model;q('#au').value=c.url;q('#ae').value=c.effort;let gap=c.gap|0;q('#ap').onchange=e=>{const v=PROV[e.target.value];if(!v)return;q('#au').value=v.url;q('#am2').value=v.model;gap=v.gap};
     q('#al').onclick=async()=>{
       const k=q('#ak').value.trim();if(!k){q('#ar').textContent='Enter your API key first.';return}
       try{const r=await fetch(q('#au').value.replace(/chat\/completions.*$/,'models'),{headers:{Authorization:'Bearer '+k}});
         const d=await r.json();if(!r.ok)throw new Error(d.error&&d.error.message||r.status);
-        const ids=d.data.map(x=>x.id).filter(i=>/^(gpt-5|o\d)/.test(i)&&!/audio|realtime|image|transcribe|tts|search|codex/.test(i)).sort().reverse();
+        const ids=d.data.map(x=>x.id).map(i=>i.replace(/^models\//,'')).filter(i=>!isOA(q('#au').value)||(/^(gpt-5|o\d)/.test(i)&&!/audio|realtime|image|transcribe|tts|search|codex/.test(i))).sort().reverse();
         q('#aml').innerHTML=ids.map(m=>`<option value="${m}">`).join('');q('#ar').style.color='var(--mut)';q('#ar').textContent=ids.length+' models loaded. Tap the Model box to pick one.';
       }catch(e){q('#ar').style.color='';q('#ar').textContent='Could not load models: '+e.message}
     };
     q('#ax').onclick=()=>{o.remove();res(false)};
-    q('#as').onclick=()=>{put({key:q('#ak').value.trim(),model:q('#am2').value.trim()||DEF.model,url:q('#au').value.trim()||DEF.url,effort:q('#ae').value});o.remove();res(true)};
+    q('#as').onclick=()=>{put({key:q('#ak').value.trim(),model:q('#am2').value.trim()||DEF.model,url:q('#au').value.trim()||DEF.url,effort:q('#ae').value,gap});window.__aigap=gap;o.remove();res(true)};
   });
 }
 window.snAISettings=settings;
 
 async function sample(prompt,opts){
   let c=cfg();
-  if(!c.key&&c.url===DEF.url){if(!(await settings()))throw err('not_granted');c=cfg();if(!c.key)throw err('not_granted')}
-  const imgs=(opts&&opts.images)||[];let content=prompt;
+  if(!c.key&&/api\.openai|googleapis|groq|openrouter/.test(c.url)){if(!(await settings()))throw err('not_granted');c=cfg();if(!c.key)throw err('not_granted')}
+  const g5=isOA(c.url)&&isG5(c.model),imgs=(opts&&opts.images)||[];let content=prompt;
   if(imgs.length){content=[{type:'text',text:prompt}];for(const b of imgs)content.push({type:'image_url',image_url:{url:await b2u(b)}})}
   const base={model:c.model,messages:[{role:'user',content}]};
   const full={...base};
-  if(isG5(c.model)){full.max_completion_tokens=16000;if(c.effort)full.reasoning_effort=c.effort}else{full.max_tokens=4096;full.temperature=0.4}
+  if(g5){full.max_completion_tokens=16000;if(c.effort)full.reasoning_effort=c.effort}else{full.max_tokens=4096;full.temperature=0.4}
   if(isOA(c.url))full.response_format={type:'json_object'};
   const send=body=>fetch(c.url,{method:'POST',headers:Object.assign({'Content-Type':'application/json'},c.key?{Authorization:'Bearer '+c.key}:{}),body:JSON.stringify(body)});
   let r,body=full,tries=0;
@@ -184,8 +185,8 @@ async function sample(prompt,opts){
     try{r=await send(body)}catch(e){throw err('network','Could not reach the AI service. Check your connection or endpoint URL.')}
     if(r.ok)break;
     let m='';try{m=(await r.json()).error.message}catch(e){}
-    if(r.status===400&&body!==base&&/unsupported|not supported|unknown|invalid/i.test(m)){body={...base,max_completion_tokens:isG5(c.model)?16000:undefined,max_tokens:isG5(c.model)?undefined:4096};continue} // retry without optional params
-    if((r.status===429||r.status>=500)&&tries<2){await sleep(2500*++tries);continue}
+    if(r.status===400&&body!==base&&/unsupported|not supported|unknown|invalid/i.test(m)){body={...base,max_completion_tokens:g5?16000:undefined,max_tokens:g5?undefined:4096};continue} // retry without optional params
+    if((r.status===429||r.status>=500)&&tries<4){await sleep(Math.max(2500*++tries,(+r.headers.get('retry-after')||0)*1000));continue}
     if(r.status===429)throw err('rate_limited',m);
     if(r.status===401||r.status===403)throw err('not_granted','Your API key was rejected. Tap ⚙️ (bottom-left) to update it. '+m);
     if(r.status===404)throw err('http','Model "'+c.model+'" was not found for your key. Tap ⚙️ and pick another model. '+m);
@@ -200,6 +201,7 @@ async function save({filename,data}){
   const a=document.createElement('a'),u=URL.createObjectURL(data);
   a.href=u;a.download=filename||'file';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),4000);
 }
+window.__aigap=cfg().gap|0;
 window.claude={use:async n=>{if(n==='sample')return sample;if(n==='downloads')return{save};throw new Error('not available')}};
 
 addEventListener('DOMContentLoaded',()=>{
