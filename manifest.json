@@ -1,0 +1,25 @@
+{
+  "id": "ybo",
+  "name": "StudyNest",
+  "short_name": "StudyNest",
+  "description": "Your AI-powered study companion for learning, flashcards, quizzes, and exam preparation.",
+  "start_url": "https://ybowankenobi.github.io/studynest./",
+  "scope": "./",
+  "display": "fullscreen",
+  "orientation": "portrait",
+  "background_color": "#000446",
+  "theme_color": "#4465ed",
+  "iarc_rating_id": "12-18+",
+  "prefer_related_applications": false,
+  "categories": [
+    "books",
+    "books &amp; reference",
+    "education"
+  ],
+  "dir": "auto",
+  "lang": "en",
+  "display_override": [
+    "fullscreen",
+    "window-controls-overlay"
+  ]
+}
