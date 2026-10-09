@@ -1,13 +1,13 @@
 {
-  "background_color": "#18304d",
-  "dir": "ltr",
+  "id": "./",
+  "name": "StudyNest",
+  "short_name": "StudyNest",
+  "description": "Your AI-powered study companion for learning, flashcards, quizzes, and exam preparation.",
+  "start_url": "./",
+  "scope": "./",
   "display": "standalone",
-  "name": "ybowankenobi.github",
-  "orientation": "any",
-  "scope": "/",
-  "short_name": "ybowankenobi.github",
-  "start_url": "/",
-  "theme_color": "#180ff1",
-  "id": "ybo",
-  "description": "An AI Study"
+  "orientation": "portrait",
+  "background_color": "#14213D",
+  "theme_color": "#14213D",
+  "icons": []
 }
