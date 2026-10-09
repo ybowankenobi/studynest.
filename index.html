@@ -1,0 +1,946 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>StudyNest</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--bg:#f5f3ff;--card:#fff;--tx:#1e1b3a;--mut:#6b6890;--bd:#e7e3fb;--ac:#7c3aed;--ac2:#ec4899;--acx:#fff;--sh:0 10px 28px rgba(76,29,149,.12)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f0d1f;--card:#1a1733;--tx:#f1eeff;--mut:#a29fc9;--bd:#2d2955;--sh:0 10px 28px rgba(0,0,0,.45)}}
+:root[data-theme="dark"]{--bg:#0f0d1f;--card:#1a1733;--tx:#f1eeff;--mut:#a29fc9;--bd:#2d2955;--sh:0 10px 28px rgba(0,0,0,.45)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;color:var(--tx);font:16px/1.55 Nunito,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:radial-gradient(900px 520px at 8% -8%,#c4b5fd66,transparent),radial-gradient(800px 520px at 100% 0,#f9a8d466,transparent),var(--bg);background-attachment:fixed}
+button,input,textarea{font:inherit;color:inherit}
+@keyframes pop{from{opacity:0;transform:translateY(14px) scale(.98)}to{opacity:1;transform:none}}
+@keyframes float{50%{transform:translateY(-12px) rotate(6deg)}}
+.wrap{max-width:980px;margin:0 auto;padding:18px 16px 70px}
+.top{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;gap:10px}
+.logo{font-weight:900;font-size:24px;cursor:pointer;letter-spacing:-.5px}.logo span{background:linear-gradient(135deg,var(--ac),var(--ac2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.av{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font-weight:900;color:#fff;background:linear-gradient(135deg,var(--ac),var(--ac2))}
+.btn{background:linear-gradient(135deg,var(--ac),var(--ac2));color:var(--acx);border:0;border-radius:14px;padding:11px 18px;cursor:pointer;font-weight:800;box-shadow:0 6px 16px rgba(124,58,237,.3);transition:transform .15s,box-shadow .15s}
+.btn:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 10px 22px rgba(124,58,237,.38)}
+.btn.alt{background:var(--card);color:var(--tx);border:2px solid var(--bd);box-shadow:none}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.in{width:100%;padding:12px 14px;border:2px solid var(--bd);border-radius:14px;background:var(--card);margin:6px 0 12px;outline:0;transition:border-color .15s,box-shadow .15s}
+.in:focus{border-color:var(--ac);box-shadow:0 0 0 4px #7c3aed22}
+textarea.in{min-height:150px;resize:vertical}
+label{font-weight:700;font-size:14px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:22px;padding:20px;box-shadow:var(--sh)}
+.err{color:#e5484d;font-size:14px;font-weight:600;margin:0 0 8px}.mut{color:var(--mut)}
+.row{display:flex;gap:10px;align-items:center}.row .in{margin:0}
+.bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
+.authwrap{display:grid;grid-template-columns:1.1fr 1fr;gap:34px;align-items:center;min-height:78vh}
+.pitch h1{font-size:44px;line-height:1.1;margin:10px 0;font-weight:900;letter-spacing:-1px}
+.pitch h1 em{font-style:normal;background:linear-gradient(135deg,var(--ac),var(--ac2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.pitch li{list-style:none;margin:8px 0;font-weight:700}.pitch ul{padding:0}
+.auth{animation:pop .5s both}
+@media(max-width:720px){.authwrap{grid-template-columns:1fr;min-height:0}.pitch h1{font-size:32px}}
+.hh{position:relative;overflow:hidden;color:#fff;border-radius:30px;padding:28px;background:linear-gradient(135deg,#7c3aed,#ec4899 70%,#f59e0b);box-shadow:var(--sh);animation:pop .5s both}
+.hh::after{content:'📚';position:absolute;right:22px;top:6px;font-size:96px;opacity:.28;animation:float 5s ease-in-out infinite}
+.hh h1{margin:0;font-size:34px;font-weight:900}.hh p{margin:4px 0 14px;opacity:.92;font-weight:700}
+.stats{display:flex;gap:8px;flex-wrap:wrap}.stats span,.chip{background:#ffffff30;backdrop-filter:blur(6px);padding:5px 12px;border-radius:999px;font-size:14px;font-weight:800}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:16px;margin-top:6px}
+.sub{cursor:pointer;color:#fff;border-radius:24px;padding:20px;min-height:170px;display:flex;flex-direction:column;justify-content:space-between;border:0;text-align:left;position:relative;overflow:hidden;background:linear-gradient(135deg,var(--c),color-mix(in srgb,var(--c) 55%,#000));box-shadow:0 12px 26px color-mix(in srgb,var(--c) 40%,transparent);transition:transform .2s;animation:pop .45s both;animation-delay:var(--d,0ms)}
+.sub:hover{transform:translateY(-6px) rotate(-1deg)}
+.sub::after{content:'';position:absolute;right:-30px;bottom:-30px;width:120px;height:120px;border-radius:50%;background:#ffffff22}
+.semo{font-size:38px}.sub b{font-size:20px;font-weight:900}.sub small{opacity:.9;font-weight:700}.sstat{font-size:14px;font-weight:800;opacity:.95}
+.empty{text-align:center;padding:36px 16px;color:var(--mut);font-weight:700}.big{font-size:60px;animation:float 4s ease-in-out infinite}
+.hero{color:#fff;border-radius:28px;padding:22px;background:linear-gradient(135deg,var(--c),color-mix(in srgb,var(--c) 55%,#000));box-shadow:0 14px 30px color-mix(in srgb,var(--c) 40%,transparent);animation:pop .4s both;position:relative}
+.hero-main{display:flex;gap:14px;align-items:center;margin:14px 0}.hero h1{margin:0;font-size:30px;font-weight:900;line-height:1.15}
+.emo{font-size:46px;background:#ffffff2e;border-radius:20px;width:72px;height:72px;display:grid;place-items:center}
+.back,.del{background:#ffffff30;color:#fff;border:0;border-radius:999px;padding:6px 14px;font-weight:800;cursor:pointer}.del{position:absolute;right:18px;top:18px}
+.tabs{display:flex;gap:6px;padding:6px;background:var(--card);border:1px solid var(--bd);border-radius:999px;margin:18px 0;overflow-x:auto;box-shadow:var(--sh)}
+.tab{background:none;border:0;padding:10px 16px;cursor:pointer;color:var(--mut);font-weight:800;white-space:nowrap;border-radius:999px;transition:all .2s}
+.tab.on{background:var(--c);color:#fff;box-shadow:0 6px 14px color-mix(in srgb,var(--c) 45%,transparent)}
+.pane{animation:pop .35s both}
+.ov{position:fixed;inset:0;background:#0b0820aa;backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:16px;z-index:30}
+.modal{width:100%;max-width:440px;max-height:92vh;overflow:auto;animation:pop .25s both}
+.btn.danger{background:linear-gradient(135deg,#ef4444,#be123c);box-shadow:0 6px 16px rgba(239,68,68,.35)}
+.c0{--hc:#fde047}.c1{--hc:#86efac}.c2{--hc:#f9a8d4}.c3{--hc:#93c5fd}
+mark.hl{background:color-mix(in srgb,var(--hc) 65%,transparent);color:inherit;border-radius:4px;padding:1px 0;cursor:pointer}
+.hlbar{position:fixed;left:0;right:0;margin:0 auto;width:fit-content;bottom:calc(env(safe-area-inset-bottom,0px) + 14px);z-index:25;display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:center;background:var(--card);border:1px solid var(--bd);box-shadow:0 12px 30px rgba(0,0,0,.28);border-radius:26px;padding:8px 14px;max-width:calc(100vw - 20px)}
+.hlbar .hint{font-size:13px;font-weight:800;color:var(--mut)}
+.dot{width:30px;height:30px;border-radius:50%;border:3px solid var(--card);box-shadow:0 0 0 1px var(--bd);cursor:pointer;background:var(--hc);padding:0}
+.hbtn{border:0;background:var(--bg);color:var(--tx);border-radius:999px;padding:6px 12px;font-weight:800;cursor:pointer;font-size:13px}
+.still,.still .sec{animation:none!important}
+#tv .fullin:last-child{padding-bottom:120px}
+.modes{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.mode{text-align:left;background:var(--card);color:var(--tx);border:2px solid var(--bd);border-radius:20px;padding:16px;cursor:pointer;box-shadow:var(--sh);transition:transform .15s,border-color .15s}
+.mode b{display:block;font-size:18px;font-weight:900}.mode small{color:var(--mut);font-weight:700}
+.mode:hover{transform:translateY(-3px)}.mode.on{border-color:var(--c);background:color-mix(in srgb,var(--c) 10%,var(--card))}
+@media(max-width:560px){.modes{grid-template-columns:1fr}}
+.part{margin:26px 0 10px;font-weight:900}.verdict{font-weight:800;margin:8px 0}
+.rate{display:flex;gap:10px;justify-content:center;margin-top:16px;flex-wrap:wrap}
+mjx-container{max-width:100%;overflow-x:auto;overflow-y:hidden}
+.mj.md{display:block}
+.formula{background:color-mix(in srgb,var(--c) 10%,transparent);border-radius:14px;padding:10px 14px;margin:8px 0;overflow-x:auto}
+.fig{margin:14px 0}.fig figcaption{font-size:14px;margin-top:6px}.chart{background:var(--bg);border-radius:16px;padding:8px}.chart svg{width:100%;height:auto;color:var(--tx)}
+.ax{fill:currentColor;opacity:.7;font-size:11px}
+.toast{position:fixed;left:0;right:0;margin:0 auto;width:fit-content;max-width:90vw;bottom:24px;background:#1e1b3a;color:#fff;padding:10px 16px;border-radius:14px;font-weight:700;opacity:0;transform:translateY(20px);pointer-events:none;transition:all .3s;z-index:60}.toast.on{opacity:1;transform:none}
+@media(max-width:520px){.tab:not(.on) .tl{display:none}.tab{padding:10px 14px}}
+input[type=file]{font-weight:700;max-width:100%}input[type=file]::file-selector-button{margin-right:12px;border:0;border-radius:12px;padding:10px 16px;font-weight:800;color:#fff;background:linear-gradient(135deg,var(--ac),var(--ac2));cursor:pointer}
+.drop{position:relative;border:3px dashed var(--bd);border-radius:20px;padding:20px;text-align:center;background:var(--bg);transition:border-color .2s,background .2s}
+.drop.over{border-color:var(--ac);background:color-mix(in srgb,var(--ac) 10%,var(--bg))}.drop b{display:block}
+.sr{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;pointer-events:none}
+.pickwrap{position:relative;display:inline-block}.ovin{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;font-size:0}
+.tact{display:flex;gap:6px;margin-left:auto;flex:none}
+.sw{display:flex;gap:10px;flex-wrap:wrap;margin:8px 0 16px}.sw i{width:34px;height:34px;border-radius:50%;cursor:pointer;border:4px solid transparent;transition:transform .15s}
+.sw i:hover{transform:scale(1.15)}.sw i.on{border-color:var(--tx)}
+.tcard{display:flex;gap:14px;align-items:flex-start;background:var(--card);border:1px solid var(--bd);border-left:6px solid var(--c);border-radius:20px;padding:16px;margin-bottom:12px;box-shadow:var(--sh);transition:transform .2s;animation:pop .4s both}
+.tcard:hover{transform:translateX(6px)}.tcard h3{margin:0 0 4px;font-weight:900}.tcard p{margin:0}
+.num{flex:none;width:40px;height:40px;border-radius:14px;display:grid;place-items:center;font-weight:900;color:#fff;background:var(--c)}
+.click{cursor:pointer}.tag{font-size:13px;color:var(--mut);font-weight:700;margin-top:4px}
+.full{position:fixed;inset:0;background:var(--bg);z-index:20;overflow:auto;animation:pop .3s both}
+.fullin{max-width:780px;margin:0 auto;padding:18px 16px}
+.tbanner{color:#fff;padding:calc(env(safe-area-inset-top,0px) + 12px) 0 28px;background:linear-gradient(135deg,var(--c),color-mix(in srgb,var(--c) 50%,#000))}
+.tbanner h1{margin:10px 0 6px;font-size:34px;font-weight:900;line-height:1.15}.tbanner p{margin:0;font-size:18px;opacity:.92}
+.sec{background:var(--card);border:1px solid var(--bd);border-radius:24px;padding:22px;margin:16px 0;box-shadow:var(--sh);animation:pop .5s both}
+.sec:nth-child(2){animation-delay:.08s}.sec:nth-child(3){animation-delay:.16s}.sec:nth-child(4){animation-delay:.24s}
+.sec h2{margin:0 0 12px;font-size:21px;font-weight:900}.sec p{margin:0 0 12px}
+.checks{list-style:none;padding:0;margin:0}.checks li{position:relative;padding:8px 0 8px 38px}
+.checks li::before{content:'✓';position:absolute;left:0;top:7px;width:26px;height:26px;border-radius:50%;background:#16a34a22;color:#16a34a;display:grid;place-items:center;font-weight:900}
+.defn{border-left:6px solid var(--c);background:color-mix(in srgb,var(--c) 12%,transparent);padding:14px 16px;border-radius:14px;font-size:18px;font-weight:700}
+.ex{background:#f59e0b18;border:2px dashed #f59e0b;border-radius:16px;padding:16px}
+.timg,.imgs img{max-width:100%;border-radius:14px;display:block;margin:8px 0}.timg{max-height:260px}
+.imgs{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-bottom:16px}.imgs small{display:block;margin-bottom:8px}
+.deck{max-width:580px;margin:0 auto;perspective:1400px}
+.fc3{position:relative;height:290px;transform-style:preserve-3d;transition:transform .6s cubic-bezier(.2,.8,.2,1);cursor:pointer}.fc3.flipped{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:28px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:26px;text-align:center;font-size:22px;font-weight:800;box-shadow:var(--sh);overflow:auto}
+.face img{max-height:120px;border-radius:12px}.face small{opacity:.75;font-size:13px}
+.front{color:#fff;background:linear-gradient(135deg,var(--c),color-mix(in srgb,var(--c) 55%,#000))}
+.face.back{transform:rotateY(180deg);background:#fff;color:#1e1b3a;border:4px solid var(--c)}.face.back *{color:#1e1b3a}
+.ctl{display:flex;gap:10px;justify-content:center;align-items:center;flex-wrap:wrap;margin-top:14px}
+.clist{display:grid;gap:8px}.crow{display:flex;gap:8px;align-items:center;background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:10px 12px}
+.crow.cur{border-color:var(--ac)}.ct{flex:1;cursor:pointer;min-width:0}.ct b,.ct small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ib{border:0;background:var(--bg);border-radius:10px;width:36px;height:36px;cursor:pointer}.ib:hover{background:var(--bd)}
+.opt{display:block;padding:11px 14px;border:2px solid var(--bd);border-radius:14px;margin:8px 0;cursor:pointer;transition:border-color .15s,background .15s}.opt:hover{border-color:var(--ac)}
+.opt.ok{border-color:#16a34a;background:#16a34a22}.opt.no{border-color:#e5484d;background:#e5484d22}
+.score{text-align:center;padding:28px}.score .em{font-size:60px;animation:float 3s ease-in-out infinite}.score b{font-size:28px;display:block}
+details{margin-top:8px}summary{cursor:pointer;color:var(--ac);font-weight:800}
+.pb{height:8px;background:var(--bd);border-radius:4px;margin-top:10px;overflow:hidden}.pb i{display:block;height:100%;background:linear-gradient(90deg,var(--ac),var(--ac2));transition:width .4s}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]'],['$$','$$']],processEscapes:true,packages:{'[-]':['autoload','require']}},svg:{fontCache:'none'},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']},startup:{typeset:false}};</script>
+<script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg.min.js" onload="MathJax.startup.promise.then(function(){typeset(document.body)})"></script>
+</head>
+<body><div id="app" class="wrap"></div>
+<script>
+const $=s=>document.querySelector(s),app=$('#app');
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const COLORS=['#6366f1','#ef4444','#f59e0b','#10b981','#06b6d4','#ec4899','#8b5cf6','#64748b'];
+let DL=null,IMG={},db=null,sample=null,U=null,D={subjects:[]},cur=null,tab='learn',q='',fi=0,flip=false,busy='',msg='',ans={},done=false,modalColor=COLORS[0];
+const ls={get(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}},del(k){try{localStorage.removeItem(k)}catch(e){}}};
+const hex=b=>[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('');
+const enc=new TextEncoder();
+const idOf=async e=>hex(await crypto.subtle.digest('SHA-256',enc.encode(e.trim().toLowerCase())));
+async function pbk(pw,salt){const k=await crypto.subtle.importKey('raw',enc.encode(pw),'PBKDF2',false,['deriveBits']);return hex(await crypto.subtle.deriveBits({name:'PBKDF2',salt:enc.encode(salt),iterations:150000,hash:'SHA-256'},k,256))}
+async function getDoc(p){if(db){const s=await db.doc(p).get();return s.exists?s.data():null}return ls.get('sn:'+p)}
+async function setDoc(p,d){if(db)await db.doc(p).set(d);else ls.set('sn:'+p,d)}
+const PART=60000;let lastParts=[],st,SQ=Promise.resolve();
+function notify(m){let e=$('#toast');if(!e){e=document.createElement('div');e.id='toast';e.className='toast';document.body.appendChild(e)}e.textContent=m;e.classList.add('on');clearTimeout(notify.t);notify.t=setTimeout(()=>e.classList.remove('on'),7000)}
+function cut(j){const a=[];let i=0;while(i<j.length){let e=Math.min(j.length,i+PART);if(e<j.length){const c=j.charCodeAt(e);if(c>=0xDC00&&c<=0xDFFF)e--}a.push(j.slice(i,e));i=e}return a.length?a:['']}
+async function flush(){
+  if(!U)return;
+  const id=U.id,parts=cut(JSON.stringify(D));
+  for(let i=1;i<parts.length;i++)if(lastParts[i]!==parts[i])await setDoc('studies/'+id+'_'+i,{p:parts[i]});
+  if(lastParts.length!==parts.length||lastParts[0]!==parts[0])await setDoc('studies/'+id,{n:parts.length,p:parts[0]});
+  for(let i=parts.length;i<lastParts.length;i++)await delDoc('studies/'+id+'_'+i);
+  lastParts=parts;
+}
+function save(){clearTimeout(st);st=setTimeout(()=>{SQ=SQ.then(flush).catch(e=>notify('⚠️ Could not save your changes: '+((e&&e.message)||'storage error')))},500)}
+async function loadAll(id){
+  const r=await getDoc('studies/'+id);lastParts=[];
+  if(!r)return{subjects:[]};
+  if(r.json)return JSON.parse(r.json);
+  const parts=[r.p||''];for(let i=1;i<(r.n|0);i++){const x=await getDoc('studies/'+id+'_'+i);parts.push((x&&x.p)||'')}
+  lastParts=parts;return JSON.parse(parts.join('')||'{"subjects":[]}');
+}
+const uid=()=>Math.random().toString(36).slice(2,10);
+const sub=()=>D.subjects.find(s=>s.id===cur);
+
+async function boot(){
+  app.innerHTML='<p class="mut">Loading…</p>';
+  try{db=await claude.use('db')}catch(e){}
+  try{sample=await claude.use('sample')}catch(e){}
+  try{DL=await claude.use('downloads')}catch(e){}
+  const s=ls.get('sn:sess');
+  if(s){try{U=s;D=await loadAll(s.id)}catch(e){U=null}}
+  render();
+}
+
+/* ---------- auth ---------- */
+let mode='login';
+function authView(){
+  const su=mode==='signup';
+  app.innerHTML=`<div class="authwrap"><div class="pitch"><div class="logo" style="cursor:default">🦉 Study<span>Nest</span></div><h1>Study smarter, <em>not harder.</em></h1><ul><li>📁 Upload whole course files</li><li>📖 AI turns them into clear topics</li><li>🃏 Flashcards, practice and quizzes</li></ul></div>
+  <div class="auth card"><h2 style="margin:0 0 4px;font-weight:900">${su?'Create your account 🎉':'Welcome back 👋'}</h2>
+  <p class="mut" style="margin-top:0">${su?'It takes less than a minute.':'Log in to pick up where you left off.'}</p>
+  ${su?'<label>Name</label><input id="nm" class="in" autocomplete="name">':''}
+  <label>Email</label><input id="em" class="in" type="email" autocomplete="email">
+  <label>Password</label><input id="pw" class="in" type="password" autocomplete="${su?'new-password':'current-password'}" placeholder="${su?'At least 8 characters':''}">
+  ${su?'<label>Confirm password</label><input id="pw2" class="in" type="password" autocomplete="new-password">':''}
+  <div class="err" id="er"></div>
+  <button class="btn" style="width:100%" id="go">${su?'Create account':'Log in'}</button>
+  <p class="mut" style="text-align:center;margin-bottom:0">${su?'Already registered?':'New here?'} <a href="#" id="sw" style="color:var(--ac);font-weight:800">${su?'Log in':'Create an account'}</a></p></div></div>`;
+  $('#sw').onclick=e=>{e.preventDefault();mode=su?'login':'signup';authView()};
+  $('#go').onclick=submitAuth;
+  app.querySelectorAll('input').forEach(i=>i.onkeydown=e=>{if(e.key==='Enter')submitAuth()});
+}
+async function submitAuth(){
+  const er=$('#er'),b=$('#go'),em=$('#em').value.trim(),pw=$('#pw').value;
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(em)){er.textContent='Enter a valid email address.';return}
+  if(pw.length<8){er.textContent='Password must be at least 8 characters.';return}
+  b.disabled=true;er.textContent='';
+  try{
+    const id=await idOf(em),acc=await getDoc('accounts/'+id);
+    if(mode==='signup'){
+      const nm=$('#nm').value.trim();
+      if(!nm){er.textContent='Enter your name.';b.disabled=false;return}
+      if(pw!==$('#pw2').value){er.textContent='Passwords do not match.';b.disabled=false;return}
+      if(acc){er.textContent='An account with this email already exists. Try logging in.';b.disabled=false;return}
+      const salt=uid()+uid()+uid();
+      await setDoc('accounts/'+id,{name:nm,email:em.toLowerCase(),salt,hash:await pbk(pw,salt),created:Date.now()});
+      await setDoc('studies/'+id,{json:JSON.stringify({subjects:[]})});
+      U={id,name:nm,email:em.toLowerCase()};D={subjects:[]};
+    }else{
+      if(!acc||await pbk(pw,acc.salt)!==acc.hash){er.textContent='Incorrect email or password.';b.disabled=false;return}
+      U={id,name:acc.name,email:acc.email};
+      D=await loadAll(id);
+    }
+    ls.set('sn:sess',U);cur=null;render();
+  }catch(e){er.textContent='Something went wrong. '+(e.message||'Please try again.');b.disabled=false}
+}
+function logout(){ls.del('sn:sess');U=null;cur=null;D={subjects:[]};mode='login';render()}
+
+/* ---------- home ---------- */
+const EMO=['📘','🧬','🧮','🌍','🎨','💻','⚗️','📜','🔭','🧠','🎵','⚖️'];
+const emo=s=>EMO[[...(s.name||'x')].reduce((a,c)=>a+c.charCodeAt(0),0)%EMO.length];
+function topBar(){return `<div class="top"><div class="logo" onclick="cur=null;render()">🦉 Study<span>Nest</span></div><div class="row"><span class="av">${esc((U.name||'?')[0].toUpperCase())}</span><button class="btn alt" onclick="logout()">Log out</button></div></div>`}
+function gridHTML(){
+  const l=D.subjects.filter(s=>(s.name+' '+s.code).toLowerCase().includes(q.toLowerCase()));
+  if(!D.subjects.length)return '<div class="empty" style="grid-column:1/-1"><div class="big">🚀</div><p>No subjects yet. Hit “Create subject” to start your first one!</p></div>';
+  if(!l.length)return '<div class="empty" style="grid-column:1/-1"><div class="big">🔍</div><p>No subjects match your search.</p></div>';
+  return l.map((s,i)=>`<button class="sub" style="--c:${s.color};--d:${i*60}ms" onclick="openSub('${s.id}')"><div class="semo">${emo(s)}</div><div><b>${esc(s.name)}</b><br><small>${esc(s.code)}</small></div><div class="sstat">📖 ${s.topics.length} topics · 🃏 ${s.cards.length} cards</div></button>`).join('');
+}
+function home(){
+  const nT=D.subjects.reduce((a,s)=>a+s.topics.length,0),nC=D.subjects.reduce((a,s)=>a+s.cards.length,0),first=esc((U.name||'').split(' ')[0]);
+  app.innerHTML=topBar()+`<div class="hh"><h1>Hey ${first}! 👋</h1><p>What are we learning today?</p><div class="stats"><span>📚 ${D.subjects.length} subjects</span><span>📖 ${nT} topics</span><span>🃏 ${nC} flashcards</span></div></div>
+  <div class="bar" style="margin:20px 0 16px"><input id="sr" class="in" style="flex:1;margin:0;min-width:180px" placeholder="🔍  Search subjects…" value="${esc(q)}"><button class="btn" onclick="newModal()">＋ Create subject</button></div><div class="grid" id="gr">${gridHTML()}</div>`;
+  $('#sr').oninput=e=>{q=e.target.value;$('#gr').innerHTML=gridHTML()};
+}
+function newModal(){
+  modalColor=COLORS[0];
+  const o=document.createElement('div');o.className='ov';o.id='ov';
+  o.innerHTML=`<div class="card modal"><h3 style="margin-top:0">Create subject</h3>
+  <label>Subject name</label><input id="sn" class="in" placeholder="e.g. Organic Chemistry">
+  <label>Subject code</label><input id="sc" class="in" placeholder="e.g. CHEM 201">
+  <label>Color</label><div class="sw">${COLORS.map((c,i)=>`<i data-c="${c}" class="${i?'':'on'}" style="background:${c}"></i>`).join('')}</div>
+  <div class="err" id="me"></div>
+  <div class="row" style="justify-content:flex-end"><button class="btn alt" id="mc">Cancel</button><button class="btn" id="ms">Create</button></div></div>`;
+  document.body.appendChild(o);
+  o.querySelectorAll('.sw i').forEach(i=>i.onclick=()=>{modalColor=i.dataset.c;o.querySelectorAll('.sw i').forEach(x=>x.classList.toggle('on',x===i))});
+  $('#mc').onclick=()=>o.remove();
+  $('#ms').onclick=()=>{
+    const n=$('#sn').value.trim(),c=$('#sc').value.trim();
+    if(!n){$('#me').textContent='Please enter a subject name.';return}
+    D.subjects.unshift({id:uid(),name:n,code:c,color:modalColor,notes:'',topics:[],cards:[],practice:[],quiz:[]});
+    save();o.remove();render();
+  };
+  $('#sn').focus();
+}
+function openSub(id){cur=id;tab='learn';fi=0;flip=false;ans={};done=false;eans={};edone=false;eov={};pqa={};pqr={};pqs={};mem=null;msg='';render()}
+function ask(msg,fn,label){
+  const o=document.createElement('div');o.className='ov';
+  o.innerHTML=`<div class="card modal" style="max-width:380px;text-align:center"><div style="font-size:44px">🗑️</div><h3 style="margin:6px 0 4px;font-weight:900">Are you sure?</h3><p class="mut" id="am"></p><div class="row" style="justify-content:center"><button class="btn alt" id="an">Cancel</button><button class="btn danger" id="ay">${label||'Delete'}</button></div></div>`;
+  document.body.appendChild(o);$('#am').textContent=msg;
+  $('#an').onclick=()=>o.remove();
+  $('#ay').onclick=()=>{o.remove();fn()};
+}
+function delSub(){ask('Delete this subject and everything in it? This cannot be undone.',()=>{const s=sub();if(!s)return;(s.images||[]).forEach(i=>delDoc(imgPath(i.id)));(s.files||[]).forEach(f=>{f.cancel=true;wipeFile(f)});D.subjects=D.subjects.filter(x=>x.id!==cur);save();cur=null;render()})}
+
+/* ---------- subject ---------- */
+function subjectView(){
+  const s=sub(),T=[['learn','📖','Learn'],['cards','🃏','Flashcards'],['practice','✏️','Practice'],['quiz','🎯','Quiz/Exam'],['files','📁','Files']];
+  app.innerHTML=topBar()+`<div class="hero" style="--c:${s.color}"><button class="back" onclick="cur=null;render()">← Subjects</button><button class="del" onclick="delSub()">Delete</button><div class="hero-main"><div class="emo">${emo(s)}</div><div><h1>${esc(s.name)}</h1><span class="chip">${esc(s.code||'No code')}</span></div></div><div class="stats"><span>📖 ${s.topics.length} topics</span><span>🃏 ${s.cards.length} cards</span><span>📁 ${(s.files||[]).length} files</span></div></div>
+  <div class="tabs" style="--c:${s.color}">${T.map(t=>`<button class="tab ${tab===t[0]?'on':''}" title="${t[2]}" onclick="tab='${t[0]}';msg='';render()">${t[1]}<span class="tl"> ${t[2]}</span></button>`).join('')}</div><div id="tb" class="pane" style="--c:${s.color}"></div>`;
+  $('#tb').innerHTML=({learn:learnTab,cards:cardsTab,practice:practiceTab,quiz:quizTab,files:filesTab})[tab](s);hydrate();typeset($('#tb'));if(tab==='files')checkInbox(false);
+  const ta=$('#notes');if(ta)ta.oninput=e=>{s.notes=e.target.value;save()};
+}
+const gen=(k,label)=>`<button class="btn" ${busy?'disabled':''} onclick="run('${k}')">${busy===k?'Working…':label}</button>`;
+const note=()=>msg?`<p class="${msg.startsWith('!')?'err':'mut'}">${esc(msg.replace(/^!/,''))}</p>`:'';
+const imgPath=id=>'imgs/'+U.id.slice(0,20)+'_'+id;
+async function delDoc(p){try{if(db)await db.doc(p).delete();else ls.del('sn:'+p)}catch(e){}}
+async function putImg(id,d){IMG[id]=d;await setDoc(imgPath(id),{d})}
+async function hydrate(){
+  for(const el of [...document.querySelectorAll('[data-img]')]){
+    const id=el.dataset.img;
+    if(!IMG[id]){try{const r=await getDoc(imgPath(id));if(r)IMG[id]=r.d}catch(e){}}
+    if(IMG[id])el.src=IMG[id];
+  }
+}
+function pending(s){
+  const fl=s.files||[];let rd=0,pr=0;
+  fl.forEach(f=>{rd+=Math.max(0,(f.ready|0)-Math.min((f.tb|0)*BATCH,f.ready|0));if(f.state==='processing')pr+=Math.max(0,(f.units|0)-(f.ready|0))});
+  const nn=(s.notes||'').length>(s.nd|0)+30;
+  if(!fl.length&&!nn)return s.topics.length?'All your notes already have topics. Add more notes or upload files to create more.':'Upload files in the Files tab (or add notes below), then create topics.';
+  return (rd||nn?`${rd} page(s) ready to turn into topics`+(nn?' + new notes':''):'All ready pages already have topics')+(pr?` · ${pr} more page(s) still processing in the background`:'');
+}
+function learnTab(s){
+  return `<div class="card"><div class="bar" style="margin:0"><div style="flex:1;min-width:200px"><b>Topics</b><div class="mut" style="font-size:14px">${mk?'⏳ Generating more topics in the background. You can start with the ones below. ':''}${esc(pending(s))}</div></div><button class="btn alt" onclick="topicModal(-1)">＋ New topic</button><button class="btn" ${mk?'disabled':''} onclick="run('learn')">${mk?'Generating…':'✨ Create topics'}</button></div>${note()}
+  <details><summary>Add notes manually</summary><textarea id="notes" class="in" placeholder="Paste lecture notes or any text…">${esc(s.notes)}</textarea></details></div>
+  <div style="margin-top:16px">${s.topics.length?s.topics.map((t,i)=>`<div class="tcard click" style="--c:${s.color};animation-delay:${Math.min(i,10)*40}ms" onclick="openTopic(${i})"><div class="num">${i+1}</div><div><h3>${M(t.title)}</h3><p class="mut">${M(t.summary||t.definition||'')}</p><div class="tag">${pgTxt(t)?'📄 '+pgTxt(t)+' · ':''}Open topic →</div></div><div class="tact"><button class="ib" title="Edit" onclick="event.stopPropagation();topicModal(${i})">✏️</button><button class="ib" title="Delete" onclick="event.stopPropagation();delTopic(${i})">🗑️</button></div></div>`).join(''):'<div class="empty"><div class="big">✨</div><p>Your topics will appear here. Click one to read it in full screen.</p></div>'}</div>`;
+}
+function closeTv(){const o=$('#tv');if(o)o.remove();const b=$('#hlbar');if(b)b.remove();document.body.style.overflow=''}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeTv()});
+function chartSVG(c){
+  const W=520,H=280,P={l:46,r:12,t:14,b:46},col=['#7c3aed','#ec4899','#f59e0b','#10b981','#06b6d4','#ef4444'];
+  const S=c.series||[],n=Math.max(1,...S.map(s=>s.vals.length)),cats=c.cats&&c.cats.length?c.cats:Array.from({length:n},(_,i)=>String(i+1));
+  const txt=(x,y,t,a)=>`<text class="ax" x="${x}" y="${y}" text-anchor="${a||'middle'}">${esc(String(t).slice(0,14))}</text>`;
+  if(c.type==='pie'||c.type==='doughnut'){
+    const v=(S[0]?S[0].vals:[]).map(x=>Math.max(0,x||0)),tot=v.reduce((a,b)=>a+b,0)||1;let a0=-Math.PI/2,sv='';const cx=150,cy=140,r=100;
+    v.forEach((x,i)=>{const a1=a0+x/tot*2*Math.PI;sv+=`<path d="M${cx} ${cy}L${cx+r*Math.cos(a0)} ${cy+r*Math.sin(a0)}A${r} ${r} 0 ${a1-a0>Math.PI?1:0} 1 ${cx+r*Math.cos(a1)} ${cy+r*Math.sin(a1)}Z" fill="${col[i%6]}"/>`;a0=a1});
+    sv+=cats.slice(0,v.length).map((k,i)=>`<rect x="290" y="${30+i*20}" width="12" height="12" fill="${col[i%6]}"/>`+txt(308,40+i*20,k+' ('+Math.round(v[i]/tot*100)+'%)','start')).join('');
+    return `<svg viewBox="0 0 ${W} ${H}" role="img">${sv}</svg>`;
+  }
+  const all=S.flatMap(s=>s.vals),mx=Math.max(0,...all)*1.1||1,mn=Math.min(0,...all),rg=(mx-mn)||1;
+  const X=i=>P.l+(i+.5)*(W-P.l-P.r)/n,Y=v=>P.t+(mx-v)/rg*(H-P.t-P.b);
+  let sv='';
+  for(let k=0;k<=4;k++){const v=mn+rg*k/4,y=Y(v);sv+=`<line x1="${P.l}" x2="${W-P.r}" y1="${y}" y2="${y}" stroke="currentColor" opacity=".12"/>`+txt(P.l-6,y+4,+v.toFixed(2),'end')}
+  const bw=(W-P.l-P.r)/n*.8/Math.max(1,S.length);
+  S.forEach((s,j)=>{
+    if(['line','area','scatter'].includes(c.type)){
+      if(c.type!=='scatter')sv+=`<polyline points="${s.vals.map((v,i)=>X(i)+','+Y(v)).join(' ')}" fill="none" stroke="${col[j%6]}" stroke-width="2.5"/>`;
+      s.vals.forEach((v,i)=>{sv+=`<circle cx="${X(i)}" cy="${Y(v)}" r="3.5" fill="${col[j%6]}"/>`});
+    }else s.vals.forEach((v,i)=>{const x=X(i)-bw*S.length/2+j*bw,y0=Y(0),y1=Y(v);sv+=`<rect x="${x}" y="${Math.min(y0,y1)}" width="${bw}" height="${Math.abs(y1-y0)}" rx="3" fill="${col[j%6]}"/>`});
+  });
+  cats.slice(0,n).forEach((k,i)=>{sv+=txt(X(i),H-P.b+16,k)});
+  if(S.length>1)S.forEach((s,j)=>{sv+=`<rect x="${P.l+j*110}" y="${H-14}" width="10" height="10" fill="${col[j%6]}"/>`+txt(P.l+j*110+14,H-5,s.name||'Series '+(j+1),'start')});
+  return `<svg viewBox="0 0 ${W} ${H}" role="img">${sv}</svg>`;
+}
+const pgTxt=t=>t.page?'Page '+t.page:t.pages?'Pages '+t.pages[0]+'–'+t.pages[1]:'';
+function sortTopics(s){
+  const fx=Object.fromEntries((s.files||[]).map((f,i)=>[f.id,i]));
+  const k=t=>[t.src==='manual'?2:(t.src==='notes'||!t.src)?0:1,fx[t.src]||0,t.page||(t.pages&&t.pages[0])||0,t.q||0];
+  s.topics.sort((a,b)=>{const x=k(a),y=k(b);for(let i=0;i<4;i++)if(x[i]!==y[i])return x[i]-y[i];return 0});
+}
+function delTopic(i){ask('Delete this topic?',()=>{const s=sub();s.topics.splice(i,1);save();closeTv();subjectView()})}
+function topicModal(i){
+  const s=sub(),t=i>=0?s.topics[i]:{},o=document.createElement('div');o.className='ov';
+  o.innerHTML=`<div class="card modal" style="max-width:580px"><h3 style="margin-top:0;font-weight:900">${i>=0?'✏️ Edit topic':'＋ New topic'}</h3>
+  <label>Title</label><input id="tt" class="in">
+  <label>Short summary (optional)</label><input id="ts" class="in">
+  <label>🎯 What you'll learn (one per line)</label><textarea id="tl" class="in" style="min-height:90px"></textarea>
+  <label>📘 Definition</label><textarea id="td" class="in" style="min-height:80px"></textarea>
+  <label>💡 The idea</label><textarea id="ti" class="in" style="min-height:130px"></textarea>
+  <label>🧪 Example</label><textarea id="te" class="in" style="min-height:100px"></textarea>
+  <label>📐 Key formulas (one per line) <small class="mut">· math: \\( x^2 \\) or \\[ x^2 \\]</small></label><textarea id="tf" class="in" style="min-height:70px"></textarea>
+  <div class="err" id="tr"></div><div class="row" style="justify-content:flex-end"><button class="btn alt" id="tx">Cancel</button><button class="btn" id="tsv">Save</button></div></div>`;
+  document.body.appendChild(o);
+  $('#tt').value=t.title||'';$('#ts').value=t.summary||'';$('#tl').value=((t.learn&&t.learn.length?t.learn:t.points)||[]).join('\n');
+  $('#td').value=t.definition||'';$('#ti').value=t.idea||t.details||'';$('#te').value=t.example||'';$('#tf').value=(t.formulas||[]).join('\n');
+  $('#tx').onclick=()=>o.remove();
+  $('#tsv').onclick=()=>{
+    const title=$('#tt').value.trim();if(!title){$('#tr').textContent='Please enter a title.';return}
+    const f={title,summary:$('#ts').value.trim(),learn:$('#tl').value.split('\n').map(x=>x.trim()).filter(Boolean),definition:$('#td').value.trim(),idea:$('#ti').value.trim(),example:$('#te').value.trim(),formulas:$('#tf').value.split('\n').map(x=>x.trim()).filter(Boolean),points:[],details:'',hl:[]};
+    if(i>=0)Object.assign(t,f);else s.topics.push({...f,src:'manual',page:null,pages:null,images:[],q:(s.seq=(s.seq|0)+1)});
+    sortTopics(s);save();o.remove();closeTv();subjectView();
+  };
+  $('#tt').focus();
+}
+let lastSel=null,curTopic=0,curT=null,ht;
+const MRE=/\\\[[\s\S]+?\\\]|\$\$[\s\S]+?\$\$|\\\([\s\S]+?\\\)/g;
+const mathSpan=m=>`<span class="mj${m[1]==='['||m.startsWith('$$')?' md':''}" data-raw="${esc(m)}">${esc(m)}</span>`;
+function richHTML(text,L){
+  L=(L||[]).slice().sort((a,b)=>a.a-b.a);
+  const toks=[];let last=0,m;MRE.lastIndex=0;
+  while((m=MRE.exec(text))){if(m.index>last)toks.push({x:text.slice(last,m.index),a:last});toks.push({m:m[0],a:m.index});last=m.index+m[0].length}
+  if(last<text.length)toks.push({x:text.slice(last),a:last});
+  let o='';
+  for(const tk of toks){
+    if(tk.m){const hh=L.find(y=>y.a<tk.a+tk.m.length&&y.b>tk.a);o+=hh?`<mark class="hl c${hh.c}">${mathSpan(tk.m)}</mark>`:mathSpan(tk.m)}
+    else{let p=0;const s0=tk.x;for(const y of L){const a=Math.max(y.a-tk.a,p),b=Math.min(y.b-tk.a,s0.length);if(b<=a)continue;o+=esc(s0.slice(p,a))+`<mark class="hl c${y.c}">`+esc(s0.slice(a,b))+'</mark>';p=b}o+=esc(s0.slice(p))}
+  }
+  return o;
+}
+const M=t=>richHTML(String(t==null?'':t),[]);
+const hlHTML=(text,k,t)=>richHTML(text,(t.hl||[]).filter(x=>x.k===k));
+let TQ=Promise.resolve();
+function typeset(el){TQ=TQ.then(async()=>{if(!window.MathJax||!el||!el.isConnected)return;if(!MathJax.typesetPromise&&MathJax.startup&&MathJax.startup.promise)await MathJax.startup.promise;if(MathJax.typesetPromise&&el.isConnected)await MathJax.typesetPromise([el])}).catch(()=>{})}
+const rawLen=n=>n.nodeType===3?n.length:(n.nodeType===1&&n.classList.contains('mj')?(n.dataset.raw||'').length:[...n.childNodes].reduce((a,c)=>a+rawLen(c),0));
+function hint(m){const e=$('#hlbar .hint');if(!e)return;e.textContent=m;clearTimeout(ht);ht=setTimeout(()=>{e.textContent='🖍️ Select text, then tap a color'},2200)}
+function blockOf(n){const e=n&&(n.nodeType===1?n:n.parentElement);return e&&e.closest?e.closest('[data-hk]'):null}
+document.addEventListener('selectionchange',()=>{
+  const tv=$('#tv');if(!tv)return;
+  const sl=getSelection();if(!sl||!sl.rangeCount||sl.isCollapsed)return;
+  const r=sl.getRangeAt(0),sb=blockOf(r.startContainer);if(!sb||!tv.contains(sb))return;
+  const eb=blockOf(r.endContainer),off=(blk,node,o)=>{const g=document.createRange();g.selectNodeContents(blk);g.setEnd(node,o);return rawLen(g.cloneContents())};
+  const a=off(sb,r.startContainer,r.startOffset),b=eb===sb?off(sb,r.endContainer,r.endOffset):rawLen(sb);
+  if(b>a)lastSel={k:sb.dataset.hk,a,b};
+});
+function mountHl(o){
+  const b=document.createElement('div');b.id='hlbar';b.className='hlbar';
+  b.innerHTML=`<span class="hint">🖍️ Select text, then tap a color</span>${[0,1,2,3].map(c=>`<button class="dot c${c}" data-c="${c}" title="Highlight"></button>`).join('')}<button class="hbtn" id="hrm">🧽 Remove</button><button class="hbtn" id="hcl">Clear all</button>`;
+  document.body.appendChild(b);lastSel=null;
+  b.addEventListener('pointerdown',e=>e.preventDefault());
+  b.querySelectorAll('.dot').forEach(d=>d.onclick=()=>hlApply(+d.dataset.c));
+  $('#hrm').onclick=hlRemove;$('#hcl').onclick=hlClear;
+  o.addEventListener('click',e=>{const m=e.target.closest&&e.target.closest('mark.hl');if(m){const r=document.createRange();r.selectNodeContents(m);const sl=getSelection();sl.removeAllRanges();sl.addRange(r)}});
+}
+function hlApply(c){
+  const t=$('#tv')&&curT;if(!t)return;
+  if(!lastSel)return hint('Select some text first, then tap a color.');
+  const {k,a,b}=lastSel;
+  t.hl=(t.hl||[]).filter(x=>!(x.k===k&&x.a<b&&x.b>a));t.hl.push({id:uid(),k,a,b,c});
+  lastSel=null;save();getSelection().removeAllRanges();openTopic(sub().topics.indexOf(curT),true);
+}
+function hlRemove(){
+  const t=$('#tv')&&curT;if(!t)return;
+  if(!lastSel)return hint('Tap a highlight (or select it) first.');
+  const {k,a,b}=lastSel,n=(t.hl||[]).length;
+  t.hl=(t.hl||[]).filter(x=>!(x.k===k&&x.a<b&&x.b>a));
+  if(t.hl.length===n)return hint('No highlight in that selection.');
+  lastSel=null;save();getSelection().removeAllRanges();openTopic(sub().topics.indexOf(curT),true);
+}
+function hlClear(){
+  const t=$('#tv')&&curT;if(!t)return;
+  if(!(t.hl||[]).length)return hint('No highlights yet.');
+  ask('Remove all highlights from this topic?',()=>{t.hl=[];save();openTopic(sub().topics.indexOf(curT),true)},'Clear all');
+}
+function openTopic(i,keep){
+  const old=$('#tv'),sc=old?old.scrollTop:0;closeTv();curTopic=i;const s=sub(),t=s.topics[i];if(!t)return;curT=t;const ix=()=>sub().topics.indexOf(t);
+  const L=(t.learn&&t.learn.length?t.learn:t.points)||[],De=t.definition||(t.idea||t.details?t.summary:'')||'',Id=t.idea||t.details||(t.definition?'':t.summary)||'',Ex=t.example||'';
+  const ps=(x,pre)=>String(x).split(/\n\s*\n/).filter(a=>a.trim()).map((a,j)=>`<p data-hk="${pre}${j}">${hlHTML(a,pre+j,t)}</p>`).join('');
+  const o=document.createElement('div');o.id='tv';o.className='full';o.style.setProperty('--c',s.color);
+  o.innerHTML=`<div class="tbanner"><div class="fullin" style="padding-bottom:0"><div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap"><button class="back" id="tc">✕ Close</button><span><button class="back" id="ted">✏️ Edit</button> <button class="back" id="tdl">🗑️ Delete</button></span></div><div style="font-weight:800;opacity:.9;margin-top:12px">Topic ${i+1} of ${s.topics.length}${pgTxt(t)?' · '+pgTxt(t):''}</div><h1>${M(t.title)}</h1>${t.summary?`<p>${M(t.summary)}</p>`:''}</div></div>
+  <div class="fullin">
+  ${L.length?`<section class="sec"><h2>🎯 What you'll learn</h2><ul class="checks">${L.map((x,j)=>`<li data-hk="l${j}">${hlHTML(x,'l'+j,t)}</li>`).join('')}</ul></section>`:''}
+  ${De?`<section class="sec"><h2>📘 Definition</h2><div class="defn" data-hk="d">${hlHTML(De,'d',t)}</div></section>`:''}
+  ${Id?`<section class="sec"><h2>💡 The idea</h2>${ps(Id,'i')}</section>`:''}
+  ${(t.formulas||[]).length?`<section class="sec"><h2>📐 Key formulas</h2>${t.formulas.map((x,j)=>`<div class="formula" data-hk="f${j}">${hlHTML(x,'f'+j,t)}</div>`).join('')}</section>`:''}
+  ${Ex?`<section class="sec"><h2>🧪 Example</h2><div class="ex">${ps(Ex,'e')}</div></section>`:''}
+  ${((t.images||[]).length||(t.charts||[]).length)?`<section class="sec"><h2>📊 Graphs & figures</h2>${(t.charts||[]).map(id=>{const c=(s.charts||[]).find(x=>x.id===id);return c?`<figure class="fig"><div class="chart">${chartSVG(c)}</div><figcaption class="mut">${M(c.title||'Chart')}</figcaption></figure>`:''}).join('')}${(t.images||[]).map(id=>{const m=(s.images||[]).find(x=>x.id===id);return `<figure class="fig"><img data-img="${id}" class="timg" style="max-height:none" alt="">${m&&m.caption?`<figcaption class="mut">${M(m.caption)}</figcaption>`:''}</figure>`}).join('')}</section>`:''}
+  <div class="bar" style="margin-top:24px;justify-content:space-between"><button class="btn alt" id="tp" ${i?'':'disabled'}>← Previous</button><button class="btn" id="tn" ${i<s.topics.length-1?'':'disabled'}>Next topic →</button></div></div>`;
+  document.body.appendChild(o);document.body.style.overflow='hidden';o.scrollTop=keep?sc:0;if(keep)o.classList.add('still');hydrate();mountHl(o);typeset(o);
+  $('#tc').onclick=closeTv;$('#ted').onclick=()=>{closeTv();topicModal(ix())};$('#tdl').onclick=()=>delTopic(ix());$('#tp').onclick=()=>openTopic(ix()-1);$('#tn').onclick=()=>openTopic(ix()+1);
+}
+function delImg(id){
+  const s=sub();s.images=(s.images||[]).filter(i=>i.id!==id);delDoc(imgPath(id));
+  s.notes=s.notes.split('[[IMG:'+id+']]').join('');
+  s.topics.forEach(t=>t.images=(t.images||[]).filter(x=>x!==id));s.cards.forEach(c=>{if(c.img===id)c.img=null});
+  save();subjectView();
+}
+const toBlob=(c,q)=>new Promise(r=>c.toBlob(r,'image/jpeg',q));
+const toURL=b=>new Promise(r=>{const f=new FileReader();f.onload=()=>r(f.result);f.readAsDataURL(b)});
+async function prep(blob){
+  let bm;try{bm=await createImageBitmap(blob)}catch(e){return null}
+  if(bm.width<80||bm.height<80)return null;
+  let m=800,q=.7,out=null;
+  for(let i=0;i<4;i++){
+    const k=Math.min(1,m/Math.max(bm.width,bm.height)),c=document.createElement('canvas');
+    c.width=Math.round(bm.width*k);c.height=Math.round(bm.height*k);
+    const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.drawImage(bm,0,0,c.width,c.height);
+    const b=await toBlob(c,q);out={blob:b,data:await toURL(b)};
+    if(out.data.length<190000)break;m*=.75;q-=.1;
+  }
+  return out;
+}
+const xml=s=>new DOMParser().parseFromString(s,'application/xml');
+const zt=(z,p)=>z.file(p)?z.file(p).async('string'):Promise.resolve('');
+function rels(d){const m={};for(const r of d.getElementsByTagName('Relationship'))m[r.getAttribute('Id')]=r.getAttribute('Target');return m}
+function norm(base,t){if(t[0]==='/')return t.slice(1);const o=[];for(const p of (base+t).split('/')){if(p==='..')o.pop();else if(p&&p!=='.')o.push(p)}return o.join('/')}
+async function pullImg(z,path,reg,list){
+  if(reg[path]!==undefined)return reg[path];
+  let id=null;const f=z.file(path);
+  if(f){const o=await prep(await f.async('blob'));if(o){id=uid();list.push({id,blob:o.blob,data:o.data})}}
+  return reg[path]=id;
+}
+async function walk(doc,ptag,z,base,rl,reg,list){
+  const out=[];
+  for(const p of doc.getElementsByTagName(ptag)){
+    let t='';
+    for(const n of p.getElementsByTagName('*')){
+      if(n.tagName==='w:t'||n.tagName==='a:t')t+=n.textContent;
+      else if(n.tagName==='a:blip'){const rid=n.getAttribute('r:embed');if(rid&&rl[rid]){const id=await pullImg(z,norm(base,rl[rid]),reg,list);if(id)t+=' [[IMG:'+id+']] '}}
+    }
+    if(t.trim())out.push(t.trim());
+  }
+  return out.join('\n');
+}
+async function readFile(f){
+  const n=f.name.toLowerCase(),list=[];let text='';
+  if(f.type.startsWith('image/')||/\.(png|jpe?g|gif|webp|bmp)$/.test(n)){const o=await prep(f);if(!o)throw new Error('Could not read this image.');list.push({id:uid(),blob:o.blob,data:o.data});return{text:'',list}}
+  if(/\.(docx|pptx|xlsx)$/.test(n)){
+    if(!window.JSZip)throw new Error('The file reader library did not load. Reload the page and try again.');
+    const z=await JSZip.loadAsync(await f.arrayBuffer()),reg={};
+    if(n.endsWith('.docx')){
+      const rl=rels(xml(await zt(z,'word/_rels/document.xml.rels')));
+      text=await walk(xml(await zt(z,'word/document.xml')),'w:p',z,'word/',rl,reg,list);
+    }else if(n.endsWith('.pptx')){
+      const sl=Object.keys(z.files).filter(k=>/^ppt\/slides\/slide\d+\.xml$/.test(k)).sort((a,b)=>a.match(/\d+/)[0]-b.match(/\d+/)[0]);
+      for(const [i,k] of sl.entries()){
+        const rl=rels(xml(await zt(z,'ppt/slides/_rels/'+k.split('/').pop()+'.rels')));
+        text+='\n--- Slide '+(i+1)+' ---\n'+await walk(xml(await zt(z,k)),'a:p',z,'ppt/slides/',rl,reg,list);
+      }
+    }else{
+      text=[...xml(await zt(z,'xl/sharedStrings.xml')).getElementsByTagName('t')].map(t=>t.textContent).join('\n');
+    }
+    return{text:text.trim(),list};
+  }
+  if(n.endsWith('.pdf')){
+    if(!window.pdfjsLib)throw new Error('The PDF reader did not load. Reload the page and try again.');
+    pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    const pdf=await pdfjsLib.getDocument({data:new Uint8Array(await f.arrayBuffer())}).promise;
+    for(let i=1;i<=pdf.numPages;i++){const c=await (await pdf.getPage(i)).getTextContent();text+='\n--- Page '+i+' ---\n'+c.items.map(x=>x.str).join(' ')}
+    return{text:text.trim(),list};
+  }
+  if(/\.(doc|ppt|xls)$/.test(n))throw new Error('Old .doc/.ppt/.xls files are not supported. Save them as .docx/.pptx/.xlsx first.');
+  if(!/\.(txt|md|csv|tsv|json|html?|xml|log|rtf)$/.test(n)&&!f.type.startsWith('text/'))return{text:'',list};
+  let t=await f.text();if(/\.html?$/.test(n))t=new DOMParser().parseFromString(t,'text/html').body.textContent;
+  return{text:t.trim(),list};
+}
+async function captions(s,fresh,src){
+  src=src==null?s.notes:src;
+  if(!sample)return;
+  let ok=false;try{ok=(await sample.limits()).images}catch(e){}
+  if(!ok)return;
+  for(let i=0;i<fresh.length;i+=4){
+    const g=fresh.slice(i,i+4);
+    const ctx=g.map((x,j)=>{const k=src.indexOf('[[IMG:'+x.id+']]');return 'Image '+(j+1)+' surrounding text: '+(k>=0?src.slice(Math.max(0,k-300),k+300):'(none, standalone upload)')}).join('\n');
+    try{
+      const r=await aiJSON(J+'For each attached image in order, write a short study caption (under 120 words): what it shows. If it contains equations, formulas or worked math, transcribe them completely in LaTeX. If it is a graph or chart, describe the axes, labels, trend and key data points. Transcribe other visible text. Use the context to say what it illustrates. Schema: {"captions":[string]}.\n'+ctx,{images:g.map(x=>x.blob)});
+      g.forEach((x,j)=>{const im=s.images.find(y=>y.id===x.id);if(im)im.caption=(r.captions&&r.captions[j])||''});
+      save();
+    }catch(e){}
+  }
+}
+const BATCH=20,BYTES=150000,Q0=[];let Q=Promise.resolve();
+const LP='Extract 3-8 key topics and 6-15 flashcards from this material. Schema: {"topics":[{"title":string,"page":number|null,"summary":string (one catchy sentence),"learn":[string,...3-5 short bullets starting with a verb, what the learner will be able to do],"definition":string (1-3 clear sentences),"idea":string (the core idea explained in plain language, 120-300 words, paragraphs separated by blank lines),"example":string (a concrete worked example, 60-200 words),"formulas":[string (each a short label plus the formula in LaTeX display math)],"images":[string],"charts":[string]}],"cards":[{"q":string,"a":string,"img":string|null}]}. List topics strictly in the order they appear in the material (first page first). "page" is the page or slide number where the topic starts, taken from the --- Page N --- or --- Slide N --- markers (null if there are none). Treat formulas, equations, worked problems and graphs as key content: put the important formulas in "formulas", explain them in "idea", and give a step-by-step solved problem in "example" when the material has one; attach figures via "images" and charts via "charts" (ids from the CHARTS list, using the [[CHART:id]] markers). Use only facts from the material. Add "images" (ids from the IMAGES list, using the [[IMG:id]] markers and captions) to a topic whose text discusses that image, and set a flashcard "img" when the question depends on the image.';
+const btPath=(id,b)=>'ftext/'+U.id.slice(0,20)+'_'+id+'_'+b,fPath=(id,n)=>'files/'+U.id.slice(0,20)+'_'+id+'_'+n;
+const sz=n=>n>1e6?(n/1e6).toFixed(1)+' MB':Math.max(1,Math.round(n/1e3))+' KB';
+const b64=buf=>{let s='';const a=new Uint8Array(buf);for(let i=0;i<a.length;i+=0x8000)s+=String.fromCharCode.apply(null,a.subarray(i,i+0x8000));return btoa(s)};
+const jobs={};
+function refresh(){if(U&&cur&&sub()&&!picking&&(tab==='files'||tab==='learn'||tab==='cards')&&!(document.activeElement&&document.activeElement.tagName==='TEXTAREA'))subjectView()}
+function fixJobs(){D.subjects.forEach(s=>(s.files||[]).forEach(f=>{if(f.state==='processing'&&!jobs[f.id])f.state='interrupted'}))}
+async function saveOriginal(f,file){
+  const buf=await file.arrayBuffer();
+  for(let i=0;i<f.chunks;i+=4){
+    if(f.cancel)return;
+    await Promise.all([0,1,2,3].filter(k=>i+k<f.chunks).map(k=>setDoc(fPath(f.id,i+k),{d:b64(buf.slice((i+k)*BYTES,(i+k+1)*BYTES))})));
+    f.saved=Math.min(f.chunks,i+4);if((i/4)%4===0)refresh();
+  }
+  f.saved=f.chunks;
+}
+async function getFile(f){
+  const out=new Uint8Array(f.size);let o=0;
+  for(let i=0;i<f.chunks;i++){const r=await getDoc(fPath(f.id,i));if(!r)throw new Error('part of the stored file is missing');const bin=atob(r.d);for(let j=0;j<bin.length;j++)out[o++]=bin.charCodeAt(j)}
+  return out;
+}
+async function wipeFile(f){for(let i=0;i<(f.chunks|0);i++)await delDoc(fPath(f.id,i));for(let b=0;b<(f.nb|0);b++)await delDoc(btPath(f.id,b))}
+const SYM={'α':'\\alpha','β':'\\beta','γ':'\\gamma','δ':'\\delta','ε':'\\epsilon','θ':'\\theta','λ':'\\lambda','μ':'\\mu','π':'\\pi','ρ':'\\rho','σ':'\\sigma','τ':'\\tau','φ':'\\phi','ω':'\\omega','Δ':'\\Delta','Σ':'\\Sigma','Ω':'\\Omega','Π':'\\Pi','Θ':'\\Theta','Φ':'\\Phi','×':'\\times','÷':'\\div','±':'\\pm','∓':'\\mp','≤':'\\leq','≥':'\\geq','≠':'\\neq','≈':'\\approx','≡':'\\equiv','∞':'\\infty','→':'\\to','←':'\\leftarrow','⇒':'\\Rightarrow','⇔':'\\Leftrightarrow','∂':'\\partial','∇':'\\nabla','·':'\\cdot','⋅':'\\cdot','−':'-','∈':'\\in','∉':'\\notin','⊂':'\\subset','⊆':'\\subseteq','∪':'\\cup','∩':'\\cap','∀':'\\forall','∃':'\\exists','∑':'\\sum','∫':'\\int','∏':'\\prod','′':"'",'°':'^{\\circ}','…':'\\ldots','∝':'\\propto','ℝ':'\\mathbb{R}','ℕ':'\\mathbb{N}','ℤ':'\\mathbb{Z}','ℚ':'\\mathbb{Q}'};
+const NARY={'∑':'\\sum','∏':'\\prod','∫':'\\int','∬':'\\iint','∭':'\\iiint','∮':'\\oint','⋃':'\\bigcup','⋂':'\\bigcap'};
+const ACC={'\u0302':'hat','\u0303':'tilde','\u0304':'bar','\u00af':'bar','\u20d7':'vec','\u0307':'dot','\u0301':'acute','\u0300':'grave'};
+const mapSym=s=>s.replace(/[%#&_$]/g,'\\$&').replace(/[^\x00-\x7f]/g,c=>SYM[c]?SYM[c]+' ':c);
+function omml(n){
+  const kid=(e,t)=>[...e.children].find(c=>c.tagName===t),all=e=>[...e.children].map(omml).join(''),arg=(e,t)=>{const k=kid(e,t);return k?all(k):''};
+  const pr=(e,t,a)=>{const x=kid(e,t),y=x&&kid(x,a);return y?y.getAttribute('m:val'):null};
+  const g=s=>'{'+s+'}',tg=n.tagName;
+  if(/Pr$/.test(tg))return '';
+  switch(tg){
+    case 'm:t':return mapSym(n.textContent);
+    case 'm:r':{const sty=pr(n,'m:rPr','m:sty'),tx=[...n.children].filter(c=>c.tagName==='m:t').map(omml).join('');return sty==='p'&&/^[A-Za-z]{2,}$/.test(tx)?'\\mathrm{'+tx+'}':tx}
+    case 'm:f':return pr(n,'m:fPr','m:type')==='noBar'?'\\binom'+g(arg(n,'m:num'))+g(arg(n,'m:den')):'\\frac'+g(arg(n,'m:num'))+g(arg(n,'m:den'));
+    case 'm:sSup':return g(arg(n,'m:e'))+'^'+g(arg(n,'m:sup'));
+    case 'm:sSub':return g(arg(n,'m:e'))+'_'+g(arg(n,'m:sub'));
+    case 'm:sSubSup':return g(arg(n,'m:e'))+'_'+g(arg(n,'m:sub'))+'^'+g(arg(n,'m:sup'));
+    case 'm:sPre':return '{}_'+g(arg(n,'m:sub'))+'^'+g(arg(n,'m:sup'))+g(arg(n,'m:e'));
+    case 'm:rad':{const d=arg(n,'m:deg');return '\\sqrt'+(d&&pr(n,'m:radPr','m:degHide')!=='1'?'['+d+']':'')+g(arg(n,'m:e'))}
+    case 'm:nary':{const ch=pr(n,'m:naryPr','m:chr')||'∫',sb=arg(n,'m:sub'),sp=arg(n,'m:sup');return (NARY[ch]||'\\int')+(sb?'_'+g(sb):'')+(sp?'^'+g(sp):'')+' '+g(arg(n,'m:e'))}
+    case 'm:d':{const b=pr(n,'m:dPr','m:begChr'),e=pr(n,'m:dPr','m:endChr'),sp=pr(n,'m:dPr','m:sepChr')||',',D=c=>c==null?'(':c===''?'.':c==='{'||c==='}'?'\\'+c:c==='〈'?'\\langle':c==='〉'?'\\rangle':c;
+      const open=b===null?'(':D(b),close=e===null?')':(e===''?'.':e==='{'||e==='}'?'\\'+e:e==='〉'?'\\rangle':e);
+      return '\\left'+open+' '+[...n.children].filter(c=>c.tagName==='m:e').map(omml).join(sp)+' \\right'+close}
+    case 'm:func':{const nm=arg(n,'m:fName');return (/^(sin|cos|tan|cot|sec|csc|log|ln|lim|exp|min|max|arcsin|arccos|arctan|sinh|cosh|tanh)$/.test(nm)?'\\'+nm:'\\mathrm'+g(nm))+' '+g(arg(n,'m:e'))}
+    case 'm:acc':{const c=pr(n,'m:accPr','m:chr');return '\\'+(ACC[c==null?'\u0302':c]||'hat')+g(arg(n,'m:e'))}
+    case 'm:bar':return (pr(n,'m:barPr','m:pos')==='bot'?'\\underline':'\\overline')+g(arg(n,'m:e'));
+    case 'm:limLow':{const b=arg(n,'m:e'),l=arg(n,'m:lim');return /^(lim|max|min)$/.test(b)?'\\'+b+'_'+g(l):'\\underset'+g(l)+g(b)}
+    case 'm:limUpp':return '\\overset'+g(arg(n,'m:lim'))+g(arg(n,'m:e'));
+    case 'm:eqArr':return '\\begin{aligned}'+[...n.children].filter(c=>c.tagName==='m:e').map(omml).join(' \\\\ ')+'\\end{aligned}';
+    case 'm:m':return '\\begin{matrix}'+[...n.children].filter(c=>c.tagName==='m:mr').map(r=>[...r.children].filter(c=>c.tagName==='m:e').map(omml).join(' & ')).join(' \\\\ ')+'\\end{matrix}';
+    default:return all(n);
+  }
+}
+const CHART_TYPES=['barChart','bar3DChart','lineChart','line3DChart','pieChart','pie3DChart','doughnutChart','areaChart','scatterChart'];
+async function pullChart(z,path,reg,cl){
+  if(reg[path]!==undefined)return reg[path];
+  let id=null;const x=await zt(z,path);
+  if(x){
+    const d=xml(x),tp=CHART_TYPES.find(k=>d.getElementsByTagName('c:'+k)[0]),vs=e=>e?[...e.getElementsByTagName('c:v')].map(a=>a.textContent):[];
+    const ser=[...d.getElementsByTagName('c:ser')].map(s=>({name:vs(s.getElementsByTagName('c:tx')[0])[0]||'',cats:vs(s.getElementsByTagName('c:cat')[0]||s.getElementsByTagName('c:xVal')[0]),vals:vs(s.getElementsByTagName('c:val')[0]||s.getElementsByTagName('c:yVal')[0]).map(v=>Number.isFinite(+v)?+v:0)}));
+    if(ser.length){const ti=d.getElementsByTagName('c:title')[0];id=uid();cl.push({id,type:(tp||'barChart').replace('3D','').replace('Chart',''),title:ti?[...ti.getElementsByTagName('a:t')].map(a=>a.textContent).join(' '):'',cats:ser[0].cats,series:ser.map(s=>({name:s.name,vals:s.vals}))})}
+  }
+  return reg[path]=id;
+}
+async function walkP(paras,z,base,rl,reg){
+  const list=[],charts=[],out=[];
+  const go=async n=>{
+    let t='';
+    for(const c of n.children){
+      const tg=c.tagName;
+      if(tg==='mc:Fallback'||tg==='w:txbxContent')continue;
+      if(tg==='m:oMathPara'){t+=' \\['+[...c.children].filter(x=>x.tagName==='m:oMath').map(omml).join(' \\\\ ')+'\\] ';continue}
+      if(tg==='m:oMath'){t+=' \\('+omml(c)+'\\) ';continue}
+      if(tg==='w:t'||tg==='a:t'){t+=c.textContent;continue}
+      if(tg==='a:blip'){const rid=c.getAttribute('r:embed');if(rid&&rl[rid]){const id=await pullImg(z,norm(base,rl[rid]),reg,list);if(id)t+=' [[IMG:'+id+']] '}continue}
+      if(tg==='c:chart'){const rid=c.getAttribute('r:id');if(rid&&rl[rid]){const id=await pullChart(z,norm(base,rl[rid]),reg,charts);if(id)t+=' [[CHART:'+id+']] '}continue}
+      t+=await go(c);
+    }
+    return t;
+  };
+  for(const p of paras){const t=await go(p);if(t.trim())out.push(t.trim())}
+  return{text:out.join('\n'),list,charts};
+}
+async function openReader(file){
+  const n=file.name.toLowerCase(),R={count:0,get:async()=>({text:'',list:[]})},reg={};
+  const pages=t=>{const a=[];for(let i=0;i<t.length;i+=3500)a.push(t.slice(i,i+3500));return a};
+  if(file.type.startsWith('image/')||/\.(png|jpe?g|gif|webp|bmp)$/.test(n)){R.count=1;R.get=async()=>{const o=await prep(file);return{text:'',list:o?[{id:uid(),blob:o.blob,data:o.data}]:[]}};return R}
+  if(/\.(docx|pptx|xlsx)$/.test(n)){
+    if(!window.JSZip)throw new Error('The file reader library did not load. Reload the page.');
+    const z=await JSZip.loadAsync(await file.arrayBuffer());
+    if(n.endsWith('.docx')){
+      const rl=rels(xml(await zt(z,'word/_rels/document.xml.rels'))),pg=[];let cu=[],len=0;
+      for(const p of xml(await zt(z,'word/document.xml')).getElementsByTagName('w:p')){cu.push(p);len+=p.textContent.length;if(len>3500){pg.push(cu);cu=[];len=0}}
+      if(cu.length)pg.push(cu);R.count=pg.length;R.get=i=>walkP(pg[i],z,'word/',rl,reg);
+    }else if(n.endsWith('.pptx')){
+      const sl=Object.keys(z.files).filter(k=>/^ppt\/slides\/slide\d+\.xml$/.test(k)).sort((a,b)=>a.match(/\d+/)[0]-b.match(/\d+/)[0]);
+      R.count=sl.length;
+      R.get=async i=>{const k=sl[i],rl=rels(xml(await zt(z,'ppt/slides/_rels/'+k.split('/').pop()+'.rels')));const r=await walkP([...xml(await zt(z,k)).getElementsByTagName('a:p')],z,'ppt/slides/',rl,reg);r.text='--- Slide '+(i+1)+' ---\n'+r.text;return r};
+    }else{
+      const st=[...xml(await zt(z,'xl/sharedStrings.xml')).getElementsByTagName('t')].map(t=>t.textContent),pg=[];
+      for(let i=0;i<st.length;i+=150)pg.push(st.slice(i,i+150).join('\n'));R.count=pg.length;R.get=async i=>({text:pg[i],list:[]});
+    }
+    return R;
+  }
+  if(n.endsWith('.pdf')){
+    if(!window.pdfjsLib)throw new Error('The PDF reader did not load. Reload the page.');
+    pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    const pdf=await pdfjsLib.getDocument({data:new Uint8Array(await file.arrayBuffer())}).promise;
+    R.count=pdf.numPages;
+    let figs=0;
+    R.get=async i=>{
+      const pg=await pdf.getPage(i+1),c=await pg.getTextContent(),tx=c.items.map(x=>x.str).join(' '),list=[];let mk='';
+      const mathy=(tx.match(/[∑∫√∂≤≥≠≈±×÷∞πΔθλμσ∇]/g)||[]).length>=6||/\b(Fig(ure)?\.?|Graph|Chart|Plot|Diagram)\s*\d/i.test(tx);
+      if(mathy&&figs<40){
+        try{const vp=pg.getViewport({scale:1.4}),cv=document.createElement('canvas');cv.width=vp.width;cv.height=vp.height;await pg.render({canvasContext:cv.getContext('2d'),viewport:vp}).promise;
+          const o=await prep(await toBlob(cv,.8));if(o){const id=uid();list.push({id,blob:o.blob,data:o.data});mk=' [[IMG:'+id+']]';figs++}}catch(e){}
+      }
+      pg.cleanup();return{text:'--- Page '+(i+1)+' ---\n'+tx+mk,list,charts:[]};
+    };
+    return R;
+  }
+  if(/\.(doc|ppt|xls)$/.test(n))throw new Error('Old .doc/.ppt/.xls files cannot be read. Save them as .docx/.pptx/.xlsx.');
+  if(/\.(txt|md|csv|tsv|json|html?|xml|log|rtf)$/.test(n)||file.type.startsWith('text/')){
+    let t=await file.text();if(/\.html?$/.test(n))t=new DOMParser().parseFromString(t,'text/html').body.textContent;
+    const pg=pages(t);R.count=pg.length;R.get=async i=>({text:pg[i],list:[]});
+  }
+  return R;
+}
+async function extractAll(s,f,R){
+  for(let b=0;b*BATCH<R.count;b++){
+    if(f.cancel)return;
+    const from=b*BATCH,to=Math.min(R.count,from+BATCH),fresh=[];let t='';
+    for(let i=from;i<to;i++){
+      const r=await R.get(i);if(r.text)t+=r.text+'\n\n';
+      for(const ch of (r.charts||[])){(s.charts=s.charts||[]).push(ch);(f.charts=f.charts||[]).push(ch.id)}
+      for(const im of (r.list||[])){if(f.imgs.length>=60)break;await putImg(im.id,im.data);(s.images=s.images||[]).push({id:im.id,caption:''});f.imgs.push(im.id);fresh.push({id:im.id,blob:im.blob})}
+    }
+    await setDoc(btPath(f.id,b),{t:t.slice(0,70000),a:from+1,z:to});
+    f.nb=b+1;f.ready=to;save();refresh();
+    if(fresh.length)captions(s,fresh,t).then(refresh).catch(()=>{});
+  }
+}
+async function runJob(s,f,file){
+  if(f.cancel)return;
+  const p1=(async()=>{try{const R=await openReader(file);f.units=R.count;refresh();await extractAll(s,f,R)}catch(e){f.err=(e&&e.message)||'Could not read this file.'}})();
+  const p2=saveOriginal(f,file).catch(e=>{f.saveErr=(e&&e.message)||'storage limit reached'});
+  await Promise.all([p1,p2]);
+  if(!f.cancel){f.state='done';delete jobs[f.id];save()}
+  if(!(s.files||[]).some(x=>x.state==='processing')&&msg.startsWith('Upload started'))msg='✅ All files are uploaded and processed. You can create topics now.';
+  refresh();
+}
+let ibBusy=false,ibLast=0;
+const ibPath=n=>'inbox/'+U.id.slice(0,20)+'_'+n;
+const dataBlob=d=>{const i=d.indexOf(','),m=/data:([^;,]+)/.exec(d.slice(0,i)),bin=atob(d.slice(i+1)),a=new Uint8Array(bin.length);for(let k=0;k<bin.length;k++)a[k]=bin.charCodeAt(k);return new Blob([a],{type:m?m[1]:'image/jpeg'})};
+async function checkInbox(manual){
+  if(!U||!cur||!sub()||ibBusy)return;
+  if(!manual&&Date.now()-ibLast<8000)return;
+  ibBusy=true;ibLast=Date.now();if(manual)subjectView();
+  let done=0;
+  try{
+    const s=sub(),docs=[];
+    for(let a=1;a<=80;a+=20){const rs=await Promise.all(Array.from({length:20},(_,k)=>getDoc(ibPath(a+k)).catch(()=>null)));rs.forEach((r,k)=>{if(r)docs.push({n:a+k,r})})}
+    const by={};
+    docs.forEach(({n,r})=>{
+      if(r.subject&&String(r.subject).trim().toLowerCase()!==s.name.trim().toLowerCase())return;
+      const g=by[r.fid]=by[r.fid]||{ns:[],parts:[],imgs:[]};g.ns.push(n);(r.kind==='img'?g.imgs:g.parts).push(r);
+    });
+    for(const fid in by){
+      const g=by[fid];if(!g.parts.length)continue;
+      const total=g.parts[0].total||1;if(g.parts.length<total)continue;
+      g.parts.sort((a,b)=>(a.seq|0)-(b.seq|0));
+      const m=g.parts[0],pages=g.parts.flatMap(p=>p.pages||[]),fresh=[];
+      const f={id:uid(),name:m.name||'File from chat',size:m.size|0,type:m.type||'',chunks:0,saved:0,units:pages.length,ready:0,nb:0,tb:0,imgs:[],state:'processing',noOrig:true};
+      s.files=s.files||[];s.files.push(f);jobs[f.id]=1;
+      for(const im of g.imgs){if(f.imgs.length>=60)break;await putImg(im.id,im.data);(s.images=s.images||[]).push({id:im.id,caption:''});f.imgs.push(im.id);fresh.push({id:im.id,blob:dataBlob(im.data)})}
+      for(const ch of g.parts.flatMap(p=>p.charts||[])){(s.charts=s.charts||[]).push(ch);(f.charts=f.charts||[]).push(ch.id)}
+      for(let b=0;b*BATCH<pages.length;b++){const from=b*BATCH,to=Math.min(pages.length,from+BATCH);await setDoc(btPath(f.id,b),{t:pages.slice(from,to).join('\n\n').slice(0,70000),a:from+1,z:to});f.nb=b+1;f.ready=to}
+      f.state='done';delete jobs[f.id];save();
+      for(const n of g.ns)await delDoc(ibPath(n));
+      done++;
+      if(fresh.length)captions(s,fresh,pages.join('\n')).then(refresh).catch(()=>{});
+    }
+    if(done)msg='✅ Imported '+done+' file(s) from chat. Now create topics in the Learn tab.';
+    else if(manual)msg='No files from chat yet. Attach a file to your chat with Claude and ask it to add it to StudyNest, then check again.';
+  }catch(e){if(manual)msg='!Could not check for files: '+((e&&e.message)||'error')}
+  ibBusy=false;if(manual||done)subjectView();
+}
+let picking=false;window.addEventListener('focus',()=>setTimeout(()=>{picking=false},800));
+function pickFiles(){picking=true;const i=$('#fileIn');if(i)i.click()}
+function uploadFiles(inp){const fs=[...inp.files];try{inp.value=''}catch(e){}startUploads(fs)}
+function dropFiles(e){e.preventDefault();const d=$('#drop');if(d)d.classList.remove('over');startUploads([...((e.dataTransfer&&e.dataTransfer.files)||[])])}
+function addPasted(){
+  const t=($('#pt')||{}).value||'';
+  if(t.trim().length<20){msg='!Paste at least a few sentences first.';return subjectView()}
+  const nm=((($('#pn')||{}).value)||'').trim()||'Pasted text';
+  startUploads([new File([t],nm.replace(/\.txt$/i,'')+'.txt',{type:'text/plain'})]);
+}
+function startUploads(fs){
+  picking=false;
+  try{
+    if(!fs.length){msg='!No file was received. If your device cannot open the file picker, use "Paste text instead" below.';return subjectView()}
+    const s=sub();if(!s)return;s.files=s.files||[];
+    for(const file of fs){
+      const f={id:uid(),name:file.name,size:file.size,type:file.type||'',chunks:Math.ceil(file.size/BYTES),saved:0,units:0,ready:0,nb:0,tb:0,imgs:[],state:'processing'};
+      s.files.push(f);jobs[f.id]=1;
+      Q=Q.then(()=>runJob(s,f,file)).catch(e=>{f.err=(e&&e.message)||'Upload failed';f.state='done';delete jobs[f.id];refresh()});
+    }
+    msg='Upload started. The first 20 pages become ready within moments; the rest keeps processing in the background. Keep this tab open until every file shows Complete.';save();subjectView();
+  }catch(e){notify('⚠️ Could not start the upload: '+((e&&e.message)||'unknown error'))}
+}
+function filesTab(s){
+  const fl=s.files||[];
+  return `<div class="card"><b>Upload files</b><p class="mut" style="margin:4px 0 10px">Any file type and size, including whole course packs. The first 20 pages are ready first so you can create topics right away. The rest is processed in the background while the whole original file is saved.</p>
+  <div class="drop" id="drop" ondragover="event.preventDefault();this.classList.add('over')" ondragleave="this.classList.remove('over')" ondrop="dropFiles(event)"><div style="font-size:40px">📂</div><b>Choose files, or drop them here</b><p class="mut" style="margin:4px 0 12px">PDF, Word, PowerPoint, Excel, images, text and more</p><div class="pickwrap"><button class="btn" tabindex="-1">📁 Choose files</button><input id="fileIn" class="ovin" type="file" multiple onclick="picking=true" onchange="uploadFiles(this)" aria-label="Choose files"></div></div>${note()}
+  <details style="margin-top:12px"><summary>Can't pick a file? Paste text instead</summary><input id="pn" class="in" style="margin-top:10px" placeholder="Name, e.g. Chapter 3 notes"><textarea id="pt" class="in" placeholder="Paste the text of your document here…"></textarea><button class="btn" onclick="addPasted()">Add as a file</button></details></div>
+  <div class="card" style="margin-top:12px"><b>📥 Files sent in chat</b><p class="mut" style="margin:4px 0 10px">Can't open the file picker on your device? Attach the file to your chat with Claude and ask it to add the file to StudyNest. It shows up here automatically.</p><button class="btn alt" ${ibBusy?'disabled':''} onclick="checkInbox(true)">${ibBusy?'Checking…':'Check for files from chat'}</button></div>
+  <div style="margin-top:16px">${fl.length?fl.map(f=>{
+    const pr=f.units?Math.round((f.ready|0)/f.units*100):0,sv=f.chunks?Math.round((f.saved|0)/f.chunks*100):100;
+    let st=f.state==='processing'?(f.units||f.ready?`Pages ready: ${f.ready} of ${f.units||'…'} · Original saved: ${sv}%`:'Queued…'):f.state==='interrupted'?`Interrupted before finishing (tab closed or reloaded). ${f.ready|0} page(s) are usable. Upload again to finish.`:`Complete · ${f.units?f.units+' pages processed':'stored (no text can be extracted from this file type)'}`;
+    return `<div class="card" style="margin-bottom:10px"><div class="bar" style="margin:0"><div style="flex:1;min-width:160px"><b>📄 ${esc(f.name)}</b>${f.noOrig?' <span class="tag">· from chat, text only</span>':''}<br><small class="mut">${sz(f.size)} · ${esc(st)}</small>${f.err?`<br><small class="err">${esc(f.err)}</small>`:''}${f.saveErr?`<br><small class="err">Original not fully saved: ${esc(f.saveErr)}</small>`:''}</div><button class="btn alt" ${f.saved===f.chunks&&!f.saveErr&&!f.noOrig?'':'disabled'} onclick="dlFile('${f.id}')">Download</button><button class="btn alt" onclick="delFile('${f.id}')">Remove</button></div>${f.state==='processing'?`<div class="pb"><i style="width:${Math.max(pr,3)}%"></i></div>`:''}</div>`}).join(''):'<p class="mut">No files uploaded yet.</p>'}</div>`;
+}
+async function material(s){
+  const parts=[];if((s.notes||'').trim())parts.push(s.notes.slice(0,6000));
+  const fl=(s.files||[]).filter(f=>f.nb>0);
+  if(fl.length){const f=fl[Math.floor(Math.random()*fl.length)],r=await getDoc(btPath(f.id,Math.floor(Math.random()*f.nb)));if(r&&r.t)parts.push(r.t.slice(0,9000))}
+  return parts.join('\n\n');
+}
+let mk=false;
+async function makeTopics(){
+  if(mk)return;
+  const s=sub();
+  if(!sample){msg='!AI generation is not available in this view.';return subjectView()}
+  mk=true;busy='learn';msg='';subjectView();
+  let calls=0,nt=0,nc=0,released=false,started=false;
+  const have=new Set(s.topics.map(x=>(x.title||'').toLowerCase())),ok=new Set((s.images||[]).map(i=>i.id)),okc=new Set((s.charts||[]).map(c=>c.id));
+  const release=()=>{if(released)return;released=true;busy='';msg='✅ Your first topics are ready. More are being generated in the background.';refresh()};
+  const split=(t,first)=>{const a=first?[t.slice(0,6000)]:[],rest=first?t.slice(6000):t;return a.concat(rest.match(/[\s\S]{1,14000}/g)||[])};
+  const doText=async(t,f,pg)=>{
+    const segs=t.trim()?split(t,!started):(f&&f.imgs.length?['']:[]);started=true;
+    for(const seg of segs){
+      const il=(s.images||[]).filter(m=>f&&f.imgs.includes(m.id)&&(seg?seg.includes('[[IMG:'+m.id+']]'):true));
+      const res=await aiJSON(J+LP+'\n\nSubject: '+s.name+(f?'\nFILE: '+f.name+(pg?' (pages '+pg[0]+'-'+pg[1]+')':''):'')+'\nMATERIAL:\n'+(seg||'(image only)')+(il.length?'\n\nIMAGES:\n'+il.map(m=>m.id+': '+(m.caption||'(no description)')).join('\n'):'')+((s.charts||[]).filter(c=>f&&(f.charts||[]).includes(c.id)&&seg.includes('[[CHART:'+c.id+']]')).map(c=>'\n'+c.id+': '+c.type+' chart "'+c.title+'"; categories: '+(c.cats||[]).join(', ')+'; '+c.series.map(x=>x.name+': '+x.vals.join(', ')).join('; ')).join('').replace(/^/,(s.charts||[]).some(c=>f&&(f.charts||[]).includes(c.id)&&seg.includes('[[CHART:'+c.id+']]'))?'\n\nCHARTS:':'').slice(0,3000)));
+      calls++;
+      (res.topics||[]).forEach(x=>{const k=(x.title||'').toLowerCase();if(!k||have.has(k))return;have.add(k);const pn=Number(x.page);s.topics.push({...x,page:pn>0?Math.round(pn):null,q:(s.seq=(s.seq|0)+1),pages:pg||null,src:f?f.id:'notes',images:(x.images||[]).filter(y=>ok.has(y)),charts:(x.charts||[]).filter(y=>okc.has(y)),formulas:Array.isArray(x.formulas)?x.formulas.filter(Boolean):[]});nt++});
+      (res.cards||[]).forEach(c=>{if(c.q&&c.a){s.cards.push({q:c.q,a:c.a,img:ok.has(c.img)?c.img:null,src:f?f.id:'notes'});nc++}});
+      sortTopics(s);save();
+      if(!released&&nt>=5)release();else refresh();
+    }
+  };
+  try{
+    if((s.notes||'').length>(s.nd|0)+30){await doText(s.notes.slice(s.nd|0),null,null);s.nd=s.notes.length}
+    for(const f of (s.files||[])){
+      while((f.tb|0)<(f.nb|0)&&calls<24){
+        const r=await getDoc(btPath(f.id,f.tb|0));
+        if(r)await doText(r.t||'',f,[r.a,r.z]);
+        f.tb=(f.tb|0)+1;save();
+      }
+    }
+    const more=(s.files||[]).some(f=>(f.tb|0)<(f.nb|0)),bg=(s.files||[]).some(f=>f.state==='processing');
+    msg=nt||nc?`Done! Created ${nt} topics and ${nc} flashcards.`+(more?' More pages are ready: click Create topics again to continue.':'')+(bg?' Other pages are still processing in the background.':''):'!Nothing new to process yet. Upload files in the Files tab or add notes.';
+  }catch(e){msg='!Generation failed: '+((e&&e.message)||'please try again.')+(nt?` (${nt} topics were saved before the error.)`:'')}
+  mk=false;busy='';subjectView();
+}
+async function dlFile(id){
+  const s=sub(),f=s.files.find(x=>x.id===id);
+  if(!DL){msg='!Downloads are not available in this view.';return subjectView()}
+  if(f.saved!==f.chunks){msg='!The original is still uploading.';return subjectView()}
+  try{msg='Preparing download…';subjectView();const a=await getFile(f);await DL.save({filename:f.name,data:new Blob([a],{type:f.type||'application/octet-stream'})});msg=''}catch(e){msg='!Could not download: '+((e&&e.message)||'cancelled')}
+  subjectView();
+}
+function delFile(id){ask('Remove this file and the topics and flashcards created from it?',()=>doDelFile(id),'Remove')}
+async function doDelFile(id){
+  const s=sub(),f=s.files.find(x=>x.id===id);
+  f.cancel=true;delete jobs[f.id];s.charts=(s.charts||[]).filter(c=>!(f.charts||[]).includes(c.id));(f.imgs||[]).forEach(i=>delDoc(imgPath(i)));s.images=(s.images||[]).filter(i=>!(f.imgs||[]).includes(i.id));
+  s.topics=s.topics.filter(x=>x.src!==id);s.cards=s.cards.filter(x=>x.src!==id);s.files=s.files.filter(x=>x.id!==id);
+  await wipeFile(f);save();subjectView();
+}
+function cardsTab(s){
+  const n=s.cards.length;
+  const bar=`<div class="bar"><button class="btn" onclick="cardModal(-1)">＋ New flashcard</button>${gen('learn','✨ Create from material')}</div>${note()}`;
+  if(!n)return bar+`<div class="empty"><div class="big">🃏</div><p>No flashcards yet. Create one yourself, or upload files and let AI make them.</p></div>`;
+  fi=Math.min(fi,n-1);const c=s.cards[fi];
+  return bar+`<div class="deck"><div class="fc3 ${flip?'flipped':''}" onclick="flip=!flip;this.classList.toggle('flipped')"><div class="face front">${c.img?`<img data-img="${c.img}" alt="">`:''}<div>${M(c.q)}</div><small>tap to flip</small></div><div class="face back"><div>${M(c.a)}</div></div></div>
+  <div class="ctl"><button class="btn alt" onclick="stepCard(-1)">←</button><b class="mut">${fi+1} / ${n}</b><button class="btn alt" onclick="stepCard(1)">→</button></div>
+  <div class="ctl"><button class="btn alt" onclick="cardModal(${fi})">✏️ Edit</button><button class="btn alt" onclick="delCardAt(${fi})">🗑️ Delete</button>${gen('cards','✨ More cards')}</div></div>
+  <h3 style="margin:28px 0 10px;font-weight:900">All cards (${n})</h3><div class="clist">${s.cards.map((x,i)=>`<div class="crow ${i===fi?'cur':''}"><div class="ct" onclick="fi=${i};flip=false;subjectView()"><b>${M(x.q)}</b><small class="mut">${M(x.a)}</small></div><button class="ib" title="Edit" onclick="cardModal(${i})">✏️</button><button class="ib" title="Delete" onclick="delCardAt(${i})">🗑️</button></div>`).join('')}</div>`;
+}
+function stepCard(d){const n=sub().cards.length;fi=(fi+d+n)%n;flip=false;subjectView()}
+function delCardAt(i){ask('Delete this flashcard?',()=>{const s=sub();s.cards.splice(i,1);fi=Math.max(0,Math.min(fi,s.cards.length-1));flip=false;save();subjectView()})}
+function cardModal(i){
+  const s=sub(),c=i>=0?s.cards[i]:{q:'',a:''},o=document.createElement('div');o.className='ov';
+  o.innerHTML=`<div class="card modal"><h3 style="margin-top:0;font-weight:900">${i>=0?'✏️ Edit flashcard':'＋ New flashcard'}</h3><label>Front (question or term) <small class="mut">· math: \\( x^2 \\)</small></label><textarea id="cq" class="in" style="min-height:90px"></textarea><label>Back (answer)</label><textarea id="ca" class="in" style="min-height:110px"></textarea><div class="err" id="ce"></div><div class="row" style="justify-content:flex-end"><button class="btn alt" id="cx">Cancel</button><button class="btn" id="cs">Save</button></div></div>`;
+  document.body.appendChild(o);$('#cq').value=c.q;$('#ca').value=c.a;
+  $('#cx').onclick=()=>o.remove();
+  $('#cs').onclick=()=>{const q=$('#cq').value.trim(),a=$('#ca').value.trim();if(!q||!a){$('#ce').textContent='Please fill in both sides.';return}
+    if(i>=0){c.q=q;c.a=a}else{s.cards.push({q,a,img:null,src:'manual'});fi=s.cards.length-1}
+    flip=false;save();o.remove();subjectView()};
+  $('#cq').focus();
+}
+let qmode='quiz',pmode='mem',mem=null,eans={},edone=false,eov={},pqa={},pqr={},pqs={};
+const modeBtns=(cur_,var_,L)=>`<div class="modes">${L.map(m=>`<button class="mode ${cur_===m[0]?'on':''}" onclick="${var_}='${m[0]}';msg='';subjectView()"><b>${m[1]}</b><small>${m[2]}</small></button>`).join('')}</div>`;
+/* ----- practice ----- */
+function practiceTab(s){
+  return modeBtns(pmode,'pmode',[['mem','🧠 Memorize flashcards','Flip through your deck until you know every card'],['quiz','✍️ Practice quiz','Answer questions in your own words, then check']])+(pmode==='quiz'?pqHTML(s):memHTML(s));
+}
+function memStart(){const s=sub();if(!s.cards.length)return;mem={q:[...s.cards].sort(()=>Math.random()-.5),total:s.cards.length,known:0,tries:0,show:false};subjectView()}
+function memAns(ok){const c=mem.q.shift();mem.tries++;if(ok)mem.known++;else mem.q.splice(Math.min(3,mem.q.length),0,c);mem.show=false;subjectView()}
+const rateBtns=()=>`<button class="btn alt" onclick="memAns(false)">😅 Still learning</button><button class="btn" onclick="memAns(true)">✅ I know it</button>`;
+function memReveal(el){if(mem.show)return;mem.show=true;el.classList.add('flipped');$('#memb').innerHTML=rateBtns()}
+function memHTML(s){
+  if(!s.cards.length)return '<div class="empty"><div class="big">🧠</div><p>You need flashcards first. Create some in the Flashcards tab.</p></div>';
+  if(!mem)return `<div class="card score"><div class="em">🧠</div><b>${s.cards.length} cards to memorize</b><p class="mut">Flip each card, then tell us if you knew it. Cards you miss come back until you know them all.</p><button class="btn" onclick="memStart()">Start memorizing</button></div>`;
+  if(!mem.q.length)return `<div class="card score"><div class="em">🎉</div><b>All ${mem.total} cards memorized!</b><p class="mut">It took ${mem.tries} flips (${Math.round(mem.total/mem.tries*100)}% first-time accuracy).</p><button class="btn" onclick="memStart()">Go again</button></div>`;
+  const c=mem.q[0];
+  return `<div class="deck"><div class="pb"><i style="width:${Math.round(mem.known/mem.total*100)}%"></i></div><p class="mut" style="text-align:center;font-weight:800">${mem.known} / ${mem.total} memorized · ${mem.q.length} left</p>
+  <div class="fc3 ${mem.show?'flipped':''}" onclick="memReveal(this)"><div class="face front">${c.img?`<img data-img="${c.img}" alt="">`:''}<div>${M(c.q)}</div><small>tap to reveal the answer</small></div><div class="face back"><div>${M(c.a)}</div></div></div>
+  <div class="rate" id="memb">${mem.show?rateBtns():'<span class="mut">Think of the answer, then tap the card.</span>'}</div></div>`;
+}
+function pqHTML(s){
+  const it=s.practice||[],got=Object.values(pqs).filter(Boolean).length,seen=Object.keys(pqs).length;
+  let h=`<div class="bar">${gen('practice',it.length?'✨ New practice quiz':'✨ Generate practice quiz')}${it.length?`<span class="mut" style="font-weight:800">Self-score: ${got} / ${seen} checked</span>`:''}</div>${note()}`;
+  if(!it.length)return h+'<div class="empty"><div class="big">✍️</div><p>Generate open-ended questions from your material, answer them yourself, then reveal the model answer.</p></div>';
+  return h+it.map((p,i)=>`<div class="card" style="margin-bottom:12px"><b>${i+1}. ${M(p.q)}</b><textarea class="in" style="min-height:70px;margin-top:10px" placeholder="Type your answer…" oninput="pqa[${i}]=this.value">${esc(pqa[i]||'')}</textarea>${pqr[i]?`<div class="ex"><b>Model answer</b><p style="margin:6px 0 0">${M(p.a)}</p></div><div class="rate" style="justify-content:flex-start"><button class="btn ${pqs[i]===false?'':'alt'}" onclick="pqs[${i}]=false;subjectView()">❌ Missed it</button><button class="btn ${pqs[i]===true?'':'alt'}" onclick="pqs[${i}]=true;subjectView()">✅ Got it</button></div>`:`<button class="btn alt" onclick="pqr[${i}]=true;subjectView()">Reveal answer</button>`}</div>`).join('');
+}
+/* ----- quiz & exam ----- */
+function quizTab(s){
+  return modeBtns(qmode,'qmode',[['quiz','🎯 Quiz','10 multiple-choice questions · quick check'],['exam','📝 Exam','59 items · multiple choice, true or false, identification']])+(qmode==='exam'?examHTML(s):quizHTML(s));
+}
+function quizHTML(s){
+  let h=`<div class="bar">${gen('quiz',s.quiz.length?'✨ New quiz':'✨ Generate quiz')}</div>${note()}`;
+  if(!s.quiz.length)return h+'<div class="empty"><div class="big">🎯</div><p>Generate a 10-question multiple-choice quiz from your material.</p></div>';
+  h+=s.quiz.map((x,i)=>`<div class="card" style="margin-bottom:10px"><b>${i+1}. ${M(x.q)}</b>${x.options.map((o,j)=>{const c=done?(j===x.answer?'ok':ans[i]===j?'no':''):'';return `<label class="opt ${c}"><input type="radio" name="q${i}" ${ans[i]===j?'checked':''} ${done?'disabled':''} onchange="ans[${i}]=${j}"> ${M(o)}</label>`}).join('')}${done&&x.explain?`<p class="mut" style="margin-bottom:0">${M(x.explain)}</p>`:''}</div>`).join('');
+  if(!done)return h+`<button class="btn" onclick="done=true;subjectView();scrollTo({top:0})">Submit quiz</button>`;
+  const sc=s.quiz.filter((x,i)=>ans[i]===x.answer).length,r=sc/s.quiz.length;
+  return `<div class="card score" style="margin-bottom:14px"><div class="em">${r>=.8?'🏆':r>=.5?'👏':'💪'}</div><b>${sc} / ${s.quiz.length} (${Math.round(r*100)}%)</b><p class="mut">${r>=.8?'Outstanding!':r>=.5?'Nice work, keep going!':'Good start. Review and try again!'}</p><button class="btn" onclick="ans={};done=false;subjectView()">Retake</button></div>`+h;
+}
+const normA=x=>String(x==null?'':x).toLowerCase().replace(/[^\p{L}\p{N}\s]/gu,'').replace(/\s+/g,' ').trim();
+const exOk=(x,i)=>{if(x.type==='id'){if(eov[i])return true;const u=normA(eans[i]);return !!u&&[x.answer,...(x.accept||[])].some(a=>normA(a)===u)}return eans[i]===x.answer};
+function examHTML(s){
+  const ex=(s.exam&&s.exam.items)||[];
+  let h=`<div class="bar">${gen('exam',ex.length?'✨ New exam':'✨ Generate exam')}</div>${note()}`;
+  if(!ex.length)return h+'<div class="empty"><div class="big">📝</div><p>Your exam has 59 items: 30 multiple choice, 14 true or false and 15 identification, built from your material.</p></div>';
+  const parts=[['mc','Part I · Multiple choice'],['tf','Part II · True or false'],['id','Part III · Identification']];
+  const card=(x,i,n)=>{
+    let b='';
+    if(x.type==='mc')b=x.options.map((o,j)=>{const c=edone?(j===x.answer?'ok':eans[i]===j?'no':''):'';return `<label class="opt ${c}"><input type="radio" name="e${i}" ${eans[i]===j?'checked':''} ${edone?'disabled':''} onchange="eans[${i}]=${j}"> ${M(o)}</label>`}).join('');
+    else if(x.type==='tf')b=[true,false].map(v=>{const c=edone?(v===x.answer?'ok':eans[i]===v?'no':''):'';return `<label class="opt ${c}"><input type="radio" name="e${i}" ${eans[i]===v?'checked':''} ${edone?'disabled':''} onchange="eans[${i}]=${v}"> ${v?'True':'False'}</label>`}).join('');
+    else b=`<input class="in" style="margin-top:10px" placeholder="Your answer…" value="${esc(eans[i]||'')}" ${edone?'disabled':''} oninput="eans[${i}]=this.value">`+(edone?`<p class="verdict">${exOk(x,i)?'✅ Correct':'❌ Answer: '+M(x.answer)}</p>${exOk(x,i)?'':`<button class="btn alt" onclick="eov[${i}]=true;subjectView()">Mark as correct</button>`}`:'');
+    return `<div class="card" style="margin-bottom:10px"><b>${n}. ${M(x.q)}</b>${b}${edone&&x.explain?`<p class="mut" style="margin:8px 0 0">${M(x.explain)}</p>`:''}</div>`;
+  };
+  let body='',n=0;
+  parts.forEach(([ty,title])=>{const ix=ex.map((x,i)=>i).filter(i=>ex[i].type===ty);if(!ix.length)return;body+=`<h3 class="part">${title} <span class="mut">(${ix.length} items)</span></h3>`+ix.map(i=>card(ex[i],i,++n)).join('')});
+  if(!edone)return h+body+`<button class="btn" onclick="edone=true;subjectView();scrollTo({top:0})">Submit exam</button>`;
+  const ok=ex.filter((x,i)=>exOk(x,i)).length,r=ok/ex.length,by=t=>{const a=ex.map((x,i)=>i).filter(i=>ex[i].type===t);return a.filter(i=>exOk(ex[i],i)).length+'/'+a.length};
+  return h+`<div class="card score" style="margin-bottom:14px"><div class="em">${r>=.8?'🏆':r>=.5?'👏':'💪'}</div><b>${ok} / ${ex.length} (${Math.round(r*100)}%)</b><p class="mut">Multiple choice ${by('mc')} · True/False ${by('tf')} · Identification ${by('id')}</p><button class="btn" onclick="eans={};edone=false;eov={};subjectView()">Retake</button></div>`+body;
+}
+async function examSources(s){
+  const src=[];
+  if((s.notes||'').trim())for(let i=0;i<s.notes.length&&src.length<4;i+=9000)src.push(s.notes.slice(i,i+9000));
+  const refs=[];(s.files||[]).forEach(f=>{for(let b=0;b<(f.nb|0);b++)refs.push([f,b])});
+  refs.sort(()=>Math.random()-.5);
+  for(const [f,b] of refs.slice(0,8)){const r=await getDoc(btPath(f.id,b));if(r&&r.t)src.push(r.t.slice(0,9000))}
+  if(!src.length&&s.topics.length)src.push(s.topics.map(t=>t.title+': '+(t.definition||t.summary||'')+' '+String(t.idea||t.details||'').slice(0,600)).join('\n').slice(0,12000));
+  return src;
+}
+async function makeExam(){
+  const s=sub();
+  if(!sample){msg='!AI generation is not available in this view.';return subjectView()}
+  busy='exam';msg='Building your exam (part 1 of 4)…';subjectView();
+  try{
+    const src=await examSources(s);
+    if(!src.join('').trim())throw new Error('Add study material first: upload a file, add notes, or create topics.');
+    const mat=i=>{let p=src.filter((_,j)=>j%4===i);if(!p.length)p=[src[i%src.length]];return '\n\nSTUDY MATERIAL:\n'+p.join('\n\n').slice(0,16000)};
+    const base=J+'Subject: '+s.name+'. Cover different parts of the material and never repeat a question. ',mcP='Write exactly 15 multiple-choice questions, 4 options each, one correct; "answer" is the 0-based index of the correct option. Schema: {"items":[{"q":string,"options":[string,string,string,string],"answer":number,"explain":string}]}.';
+    const step=async(i,prompt)=>{msg='Building your exam (part '+(i+1)+' of 4)…';subjectView();return await aiJSON(base+prompt+mat(i))};
+    const a=await step(0,mcP),b=await step(1,mcP);
+    const c=await step(2,'Write exactly 14 true-or-false statements, about half true and half false. Schema: {"items":[{"q":string (a statement),"answer":boolean,"explain":string}]}.');
+    const d=await step(3,'Write exactly 15 identification questions whose answer is a short term, name or phrase (1-4 words). Schema: {"items":[{"q":string,"answer":string,"accept":[string] (acceptable alternative answers),"explain":string}]}.');
+    const mc=[...(a.items||[]),...(b.items||[])].filter(x=>x.options&&x.options.length>1&&Number.isInteger(x.answer)).map(x=>({...x,type:'mc'}));
+    const tf=(c.items||[]).filter(x=>typeof x.answer==='boolean').map(x=>({...x,type:'tf'}));
+    const idn=(d.items||[]).filter(x=>x.answer).map(x=>({...x,type:'id',accept:x.accept||[]}));
+    s.exam={items:[...mc,...tf,...idn],at:Date.now()};eans={};edone=false;eov={};save();
+    msg='Exam ready: '+s.exam.items.length+' items.';
+  }catch(e){msg='!Could not build the exam: '+((e&&e.message)||'please try again.')}
+  busy='';subjectView();
+}
+/* ---------- AI ---------- */
+const MATHNOTE=String.raw`Write ALL mathematics in LaTeX, in every text field: inline math as \\( ... \\) and display equations as \\[ ... \\]. Because your reply is JSON, every backslash must be doubled exactly as shown here (for example \\frac, \\sqrt, \\alpha, \\sum).`;
+const J='Respond with ONLY valid JSON, no markdown fences or commentary. '+MATHNOTE+' ';
+const fixCtl=v=>typeof v==='string'?v.replace(/\f/g,'\\f').replace(/\x08/g,'\\b').replace(/\v/g,'\\v').replace(/\t/g,'\\t').replace(/\r/g,'\\r'):Array.isArray(v)?v.map(fixCtl):v&&typeof v==='object'?Object.fromEntries(Object.entries(v).map(([k,x])=>[k,fixCtl(x)])):v;
+async function aiJSON(prompt,opts){
+  const r=await sample(prompt,opts);let t=(r.text||'').trim().replace(/^```(?:json)?\s*/i,'').replace(/```\s*$/,'');
+  const i=t.indexOf('{'),j=t.lastIndexOf('}');if(i>=0&&j>i)t=t.slice(i,j+1);
+  try{return fixCtl(JSON.parse(t))}catch(e){}
+  try{return fixCtl(JSON.parse(t.replace(/\\(?!["\\\/]|u[0-9a-fA-F]{4})/g,'\\\\')))}catch(e){throw new Error('The AI reply could not be read'+(r.truncated?' (it was cut off)':'')+'. Please try again.')}
+}
+
+async function run(k){
+  if(k==='learn')return makeTopics();
+  if(k==='exam')return makeExam();
+  const s=sub(),src=(await material(s)).trim(),imgs=(s.images||[]).filter(i=>src.includes(i.id));
+  if(src.length<30&&!imgs.some(i=>i.caption)){msg='!Upload a file in the Files tab (or add notes in the Learn tab) first.';return subjectView()}
+  if(!sample){msg='!AI generation is not available in this view.';return subjectView()}
+  busy=k;msg='';subjectView();
+  const text='\n\nSTUDY MATERIAL:\n'+src.slice(0,14000)+(imgs.length?'\n\nIMAGES (each appears in the material as [[IMG:id]]):\n'+imgs.map(i=>i.id+': '+(i.caption||'(no description)')).join('\n'):'');
+  try{
+    if(k==='learn'){
+      const r=await aiJSON(J+'Subject: '+s.name+'. Extract from the material 4-10 key topics and 8-20 flashcards. Schema: {"topics":[{"title":string,"summary":string (2-3 sentences),"points":[string,...3-5],"images":[string]}],"cards":[{"q":string,"a":string,"img":string|null}]}. Use only facts from the material. Add "images":[image ids] to each topic whose text discusses an image (use the [[IMG:id]] markers and captions; only ids from the IMAGES list), and set a flashcard "img" when the question depends on that image.'+text);
+      const ok=new Set(imgs.map(i=>i.id));s.topics=(r.topics||[]).map(t=>({...t,images:(t.images||[]).filter(x=>ok.has(x))}));(r.cards||[]).forEach(c=>{if(!ok.has(c.img))c.img=null});s.cards=(s.cards||[]).concat(r.cards||[]);msg='Created '+s.topics.length+' topics and '+(r.cards||[]).length+' flashcards.';
+    }else if(k==='cards'){
+      const have=s.cards.map(c=>c.q).slice(-40).join(' | ');
+      const r=await aiJSON(J+'Write 10 NEW flashcards from the material that do not repeat these questions: '+have+'. Schema: {"cards":[{"q":string,"a":string}]}.'+text);
+      s.cards=s.cards.concat(r.cards||[]);
+    }else if(k==='practice'){
+      const r=await aiJSON(J+'Write 8 open-ended practice questions (mix of recall, explain and apply) with model answers. Schema: {"items":[{"q":string,"a":string}]}.'+text);
+      s.practice=r.items||[];pqa={};pqr={};pqs={};
+    }else if(k==='quiz'){
+      const r=await aiJSON(J+'Write 10 multiple-choice questions, 4 options each, one correct. "answer" is the 0-based index of the correct option. Schema: {"items":[{"q":string,"options":[string,string,string,string],"answer":number,"explain":string}]}.'+text);
+      s.quiz=(r.items||[]).filter(x=>x.options&&x.options.length>1);ans={};done=false;
+    }
+    save();
+  }catch(e){msg='!Generation failed: '+((e&&e.message)||'please try again.')}
+  busy='';subjectView();
+}
+
+function render(){if(U)fixJobs();U?(cur&&sub()?subjectView():(cur=null,home())):authView()}
+boot();
+</script></body></html>
