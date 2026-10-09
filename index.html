@@ -131,83 +131,135 @@ details{margin-top:8px}summary{cursor:pointer;color:var(--ac);font-weight:800}
 <script>
 (function(){
 if(window.claude&&window.claude.use)return; // inside Claude: do nothing
-const K='sn:ai',DEF={url:'https://api.openai.com/v1/chat/completions',model:'gpt-5.4-mini',key:'',effort:'low',gap:0};
-const PROV={openai:{url:DEF.url,model:'gpt-5.4-mini',gap:0},gemini:{url:'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions',model:'gemini-2.5-flash',gap:4000},groq:{url:'https://api.groq.com/openai/v1/chat/completions',model:'llama-3.3-70b-versatile',gap:3000},openrouter:{url:'https://openrouter.ai/api/v1/chat/completions',model:'openrouter/auto',gap:1500},ollama:{url:'http://localhost:11434/v1/chat/completions',model:'llama3.1',gap:0}};
-const PRESETS=['gpt-5.4-mini','gpt-5.4','gpt-5.4-nano','gpt-5.5','gpt-5.6-terra','gpt-5.6-sol','gpt-5.6-luna'];
-const cfg=()=>{try{return Object.assign({},DEF,JSON.parse(localStorage.getItem(K)||'{}'))}catch(e){return{...DEF}}};
-const put=c=>{try{localStorage.setItem(K,JSON.stringify(c))}catch(e){}};
+const AI={
+  provider:'groq'
+  proxy:'https://ybowankenobi.github.io/studynest./'
+  key:'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'
+  model:''
+};
+const BASE={groq:'https://api.groq.com/openai/v1',gemini:'https://generativelanguage.googleapis.com/v1beta/openai',openai:'https://api.openai.com/v1',openrouter:'https://openrouter.ai/api/v1'};
+const GAP={groq:3000,gemini:4000,openai:0,openrouter:1500};
+const PREF={groq:[/llama-3\.3-70b/,/gpt-oss-120b/,/llama-4/,/llama.*70b/,/qwen/,/llama/],gemini:[/gemini-2\.5-flash$/,/gemini-[\d.]+-flash$/,/flash(?!.*(lite|image|tts|live))/,/pro/,/gemini/],openai:[/^gpt-5(\.\d)?-mini$/,/^gpt-5\.\d$/,/^gpt-5/,/^gpt-4o-mini/,/^gpt-4/],openrouter:[/^openrouter\/auto$/]};
+const BAD=/whisper|tts|audio|embed|guard|moderat|image|realtime|transcribe|orpheus|safeguard|dall|sora|search|codex|computer|live/i;
+const K='sn:ai',MK='sn:aimodel';
+const embedded=!!(AI.proxy||AI.key);
+const ls={g(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},s(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const cfg=()=>embedded?{provider:AI.provider,proxy:AI.proxy,key:AI.key,model:AI.model}:Object.assign({provider:'groq',proxy:'',key:'',model:''},ls.g(K)||{});
+const baseOf=c=>(c.proxy||BASE[c.provider]||BASE.groq).replace(/\/+$/,'');
 const err=(code,m)=>{const e=new Error(m||code);e.code=code;return e};
-const b2u=b=>new Promise(r=>{const f=new FileReader();f.onload=()=>r(f.result);f.readAsDataURL(b)});
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
-const isOA=u=>/api\.openai\.com/.test(u),isG5=m=>/^(gpt-5|o\d)/i.test(m);
+const b2u=b=>new Promise(r=>{const f=new FileReader();f.onload=()=>r(f.result);f.readAsDataURL(b)});
+const hdr=c=>Object.assign({'Content-Type':'application/json'},c.key?{Authorization:'Bearer '+c.key}:{});
 
-function settings(){
+async function pick(c){ // find the best model this key can really use
+  const r=await fetch(baseOf(c)+'/models',{headers:hdr(c)});
+  if(r.status===401||r.status===403)throw err('not_granted','The AI key was rejected. Check the key in StudyNest\'s AI setup.');
+  if(!r.ok)throw err('http','Could not load the model list ('+r.status+').');
+  const d=await r.json(),ids=(d.data||d.models||[]).map(x=>String(x.id||x.name).replace(/^models\//,'')).filter(i=>!BAD.test(i)).sort().reverse();
+  if(!ids.length)throw err('http','This key has no usable chat models.');
+  for(const re of (PREF[c.provider]||[])){const m=ids.find(i=>re.test(i));if(m)return m}
+  return ids[0];
+}
+async function model(c,force){
+  if(c.model&&!force)return c.model;
+  const ck=c.provider+'|'+baseOf(c),cache=ls.g(MK)||{};
+  if(cache[ck]&&!force)return cache[ck];
+  const m=await pick(c);cache[ck]=m;ls.s(MK,cache);return m;
+}
+
+function setup(){
   return new Promise(res=>{
     const c=cfg(),o=document.createElement('div');o.className='ov';o.style.zIndex=80;
-    o.innerHTML=`<div class="card modal"><h3 style="margin-top:0;font-weight:900">⚙️ AI settings</h3>
-    <p class="mut" style="margin-top:0;font-size:14px">Paste an OpenAI API key from platform.openai.com. It is stored only in this browser.</p>
-    <label>AI provider</label><select id="ap" class="in"><option value="">Custom / keep current</option><option value="openai">OpenAI (paid, highest quality)</option><option value="gemini">Google Gemini (free tier)</option><option value="groq">Groq (free tier, very fast)</option><option value="openrouter">OpenRouter (many models, some free)</option><option value="ollama">Ollama on my own computer (truly unlimited)</option></select><label>API key</label><input id="ak" class="in" type="password" placeholder="sk-..." autocomplete="off">
-    <label>Model</label><input id="am2" class="in" list="aml" placeholder="gpt-5.4-mini"><datalist id="aml">${PRESETS.map(m=>`<option value="${m}">`).join('')}</datalist>
-    <button class="btn alt" id="al" style="margin:-4px 0 12px;padding:7px 12px;font-size:13px">🔄 Load models available to my key</button>
-    <label>Quality</label><select id="ae" class="in"><option value="none">Fastest</option><option value="low">Balanced (recommended)</option><option value="medium">Higher quality</option><option value="high">Best, slower</option></select>
-    <label>Endpoint URL</label><input id="au" class="in">
-    <p class="mut" style="font-size:12px;margin-top:0">Public site? Use a proxy (e.g. Cloudflare Worker) as the endpoint and leave the key empty, so your key is never exposed.</p>
-    <div class="err" id="ar"></div>
-    <div class="row" style="justify-content:flex-end"><button class="btn alt" id="ax">Cancel</button><button class="btn" id="as">Save</button></div></div>`;
-    document.body.appendChild(o);const q=s=>o.querySelector(s);
-    q('#ak').value=c.key;q('#am2').value=c.model;q('#au').value=c.url;q('#ae').value=c.effort;let gap=c.gap|0;q('#ap').onchange=e=>{const v=PROV[e.target.value];if(!v)return;q('#au').value=v.url;q('#am2').value=v.model;gap=v.gap};
-    q('#al').onclick=async()=>{
-      const k=q('#ak').value.trim();if(!k){q('#ar').textContent='Enter your API key first.';return}
-      try{const r=await fetch(q('#au').value.replace(/chat\/completions.*$/,'models'),{headers:{Authorization:'Bearer '+k}});
-        const d=await r.json();if(!r.ok)throw new Error(d.error&&d.error.message||r.status);
-        const ids=d.data.map(x=>x.id).map(i=>i.replace(/^models\//,'')).filter(i=>!isOA(q('#au').value)||(/^(gpt-5|o\d)/.test(i)&&!/audio|realtime|image|transcribe|tts|search|codex/.test(i))).sort().reverse();
-        q('#aml').innerHTML=ids.map(m=>`<option value="${m}">`).join('');q('#ar').style.color='var(--mut)';q('#ar').textContent=ids.length+' models loaded. Tap the Model box to pick one.';
-      }catch(e){q('#ar').style.color='';q('#ar').textContent='Could not load models: '+e.message}
-    };
+    o.innerHTML=`<div class="card modal"><h3 style="margin-top:0;font-weight:900">⚙️ AI setup</h3><label>Provider</label><select id="ap" class="in"><option value="groq">Groq (free)</option><option value="gemini">Google Gemini (free)</option><option value="openai">OpenAI (paid)</option><option value="openrouter">OpenRouter</option><option value="browser">On-device (unlimited, 1-2 GB download)</option></select><label>API key</label><input id="ak" class="in" type="password" autocomplete="off"><p class="mut" style="font-size:13px;margin-top:0">The model is chosen automatically. Your key stays in this browser.</p><div class="row" style="justify-content:flex-end"><button class="btn alt" id="ax">Cancel</button><button class="btn" id="as">Save</button></div></div>`;
+    document.body.appendChild(o);const q=s=>o.querySelector(s);q('#ap').value=ls.g('sn:offline')?'browser':c.provider;q('#ak').value=c.key;
     q('#ax').onclick=()=>{o.remove();res(false)};
-    q('#as').onclick=()=>{put({key:q('#ak').value.trim(),model:q('#am2').value.trim()||DEF.model,url:q('#au').value.trim()||DEF.url,effort:q('#ae').value,gap});window.__aigap=gap;o.remove();res(true)};
+    q('#as').onclick=()=>{const v=q('#ap').value;if(v==='browser')ls.s('sn:offline',1);else{ls.s('sn:offline',0);ls.s(K,{provider:v,key:q('#ak').value.trim()});ls.s(MK,{})}window.__aigap=v==='browser'?0:(GAP[v]||0);o.remove();res(true)};
   });
 }
-window.snAISettings=settings;
 
-async function sample(prompt,opts){
+async function cloud(prompt,opts){
   let c=cfg();
-  if(!c.key&&/api\.openai|googleapis|groq|openrouter/.test(c.url)){if(!(await settings()))throw err('not_granted');c=cfg();if(!c.key)throw err('not_granted')}
-  const g5=isOA(c.url)&&isG5(c.model),imgs=(opts&&opts.images)||[];let content=prompt;
-  if(imgs.length){content=[{type:'text',text:prompt}];for(const b of imgs)content.push({type:'image_url',image_url:{url:await b2u(b)}})}
-  const base={model:c.model,messages:[{role:'user',content}]};
-  const full={...base};
-  if(g5){full.max_completion_tokens=16000;if(c.effort)full.reasoning_effort=c.effort}else{full.max_tokens=4096;full.temperature=0.4}
-  if(isOA(c.url))full.response_format={type:'json_object'};
-  const send=body=>fetch(c.url,{method:'POST',headers:Object.assign({'Content-Type':'application/json'},c.key?{Authorization:'Bearer '+c.key}:{}),body:JSON.stringify(body)});
-  let r,body=full,tries=0;
+  if(!c.key&&!c.proxy){if(!(await setup()))throw err('not_granted');c=cfg();if(!c.key)throw err('not_granted')}
+  const imgs=(opts&&opts.images)||[];let withImg=imgs.length>0,healed=false,tries=0,drop=false;
+  let m=await model(c);
+  const build=()=>{
+    let content=prompt;
+    return (async()=>{
+      if(withImg){content=[{type:'text',text:prompt}];for(const b of imgs)content.push({type:'image_url',image_url:{url:await b2u(b)}})}
+      const g5=c.provider==='openai'&&/^(gpt-5|o\d)/i.test(m),b={model:m,messages:[{role:'user',content}]};
+      if(g5){b.max_completion_tokens=16000;if(!drop)b.reasoning_effort='low'}else b.max_tokens=4096;
+      if(!drop&&['openai','groq','gemini'].includes(c.provider))b.response_format={type:'json_object'};
+      return JSON.stringify(b);
+    })();
+  };
   for(;;){
-    try{r=await send(body)}catch(e){throw err('network','Could not reach the AI service. Check your connection or endpoint URL.')}
-    if(r.ok)break;
-    let m='';try{m=(await r.json()).error.message}catch(e){}
-    if(r.status===400&&body!==base&&/unsupported|not supported|unknown|invalid/i.test(m)){body={...base,max_completion_tokens:g5?16000:undefined,max_tokens:g5?undefined:4096};continue} // retry without optional params
+    let r;
+    try{r=await fetch(baseOf(c)+'/chat/completions',{method:'POST',headers:hdr(c),body:await build()})}
+    catch(e){throw err('network','Could not reach the AI service. Check your internet connection.')}
+    if(r.ok){const d=await r.json(),ch=d.choices&&d.choices[0];return{text:(ch&&ch.message&&ch.message.content)||'',truncated:!!(ch&&ch.finish_reason==='length')}}
+    let msg='';try{const j=await r.json();msg=(j.error&&j.error.message)||j.message||JSON.stringify(j).slice(0,200)}catch(e){}
+    if(r.status===401||r.status===403)throw err('not_granted','The AI key was rejected. '+msg);
+    if((r.status===404||r.status===400)&&!healed&&/model|decommission|not found|does not exist|deprecated|access/i.test(msg)&&!/response_format|json/i.test(msg)){healed=true;m=await model(c,true);continue} // auto-fix wrong/retired model
+    if(r.status===400&&withImg){withImg=false;continue}
+    if(r.status===400&&!drop){drop=true;continue} // retry without optional params
     if((r.status===429||r.status>=500)&&tries<4){await sleep(Math.max(2500*++tries,(+r.headers.get('retry-after')||0)*1000));continue}
-    if(r.status===429)throw err('rate_limited',m);
-    if(r.status===401||r.status===403)throw err('not_granted','Your API key was rejected. Tap ⚙️ (bottom-left) to update it. '+m);
-    if(r.status===404)throw err('http','Model "'+c.model+'" was not found for your key. Tap ⚙️ and pick another model. '+m);
-    throw err('http',m||('AI request failed ('+r.status+').'));
+    if(r.status===429)throw err('rate_limited',msg);
+    throw err('http',msg||('AI request failed ('+r.status+').'));
   }
-  const d=await r.json(),ch=d.choices&&d.choices[0];
-  return{text:(ch&&ch.message&&ch.message.content)||'',truncated:!!(ch&&ch.finish_reason==='length')};
 }
-sample.limits=async()=>({images:true});
+
+/* ---- on-device AI (WebLLM, runs in the browser, no key, no limits) ---- */
+let W=null,WP=null;
+function bar(t,p){let e=document.getElementById('snlm');if(t===null){if(e)e.remove();return}
+  if(!e){e=document.createElement('div');e.id='snlm';e.style.cssText='position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 70px);z-index:90;max-width:90vw;width:340px;background:var(--card);color:var(--tx);border:1px solid var(--bd);border-radius:16px;padding:12px 14px;box-shadow:var(--sh);font:700 13px Nunito,system-ui,sans-serif';document.body.appendChild(e)}
+  e.innerHTML='<div>'+t+'</div><div class="pb"><i style="width:'+Math.round((p||0)*100)+'%"></i></div>'}
+async function engine(){
+  if(W)return W;
+  if(!navigator.gpu)throw err('http','On-device AI needs a browser with WebGPU (recent Chrome or Edge, on a computer or a modern Android phone).');
+  if(!WP)WP=(async()=>{
+    bar('Loading on-device AI…',0);
+    const wl=await import('https://esm.run/@mlc-ai/web-llm'),ids=wl.prebuiltAppConfig.model_list.map(m=>m.model_id);
+    const id=[/^Qwen2\.5-3B-Instruct-q4f16_1-MLC$/,/^Llama-3\.2-3B-Instruct-q4f16_1-MLC$/,/^Qwen2\.5-1\.5B-Instruct-q4f16_1-MLC$/,/^Llama-3\.2-1B-Instruct-q4f16_1-MLC$/].map(re=>ids.find(i=>re.test(i))).find(Boolean)||ids.find(i=>/Instruct.*q4f16_1/.test(i));
+    const e=await wl.CreateMLCEngine(id,{initProgressCallback:p=>bar('Downloading on-device AI (first time only)… '+Math.round((p.progress||0)*100)+'%',p.progress)},{context_window_size:8192});
+    bar(null);return e;
+  })().catch(e=>{WP=null;bar(null);throw err('http','On-device AI could not start: '+((e&&e.message)||'unknown error'))});
+  W=await WP;return W;
+}
+async function local(prompt){
+  const e=await engine(),msgs=[{role:'user',content:prompt.length>9000?prompt.slice(0,9000):prompt}];
+  bar('On-device AI is thinking… this can take a minute',1);
+  try{
+    let r;
+    try{r=await e.chat.completions.create({messages:msgs,max_tokens:2500,temperature:0.3,response_format:{type:'json_object'}})}
+    catch(x){r=await e.chat.completions.create({messages:msgs,max_tokens:2500,temperature:0.3})}
+    const ch=r.choices[0];return{text:ch.message.content||'',truncated:ch.finish_reason==='length'};
+  }catch(x){throw err('http','On-device AI failed: '+((x&&x.message)||'out of memory?'))}
+  finally{bar(null)}
+}
+async function offerLocal(){
+  if(!navigator.gpu)return false;
+  const ok=confirm('The cloud AI is busy right now.\n\nSwitch to unlimited on-device AI? It downloads about 1-2 GB once, then works with no limits. Quality is a bit lower.');
+  if(ok)ls.s('sn:offline',1);return ok;
+}
+async function sample(prompt,opts){
+  if(ls.g('sn:offline')){window.__aigap=0;return local(prompt)}
+  try{return await cloud(prompt,opts)}
+  catch(e){if(e.code==='rate_limited'&&await offerLocal()){window.__aigap=0;return local(prompt)}throw e}
+}
+sample.limits=async()=>{const c=cfg();return{images:!ls.g('sn:offline')&&(c.provider==='openai'||c.provider==='gemini')}};
 
 async function save({filename,data}){
   const a=document.createElement('a'),u=URL.createObjectURL(data);
   a.href=u;a.download=filename||'file';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),4000);
 }
-window.__aigap=cfg().gap|0;
+window.__aigap=GAP[cfg().provider]||0;
 window.claude={use:async n=>{if(n==='sample')return sample;if(n==='downloads')return{save};throw new Error('not available')}};
 
 addEventListener('DOMContentLoaded',()=>{
-  const g=document.createElement('button');g.textContent='⚙️';g.title='AI settings';
+  if(embedded&&!/[?&]ai=setup/.test(location.search))return; // fully built in: no setup button for users
+  const g=document.createElement('button');g.textContent='⚙️';g.title='AI setup';
   g.style.cssText='position:fixed;left:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 12px);z-index:70;width:42px;height:42px;border-radius:50%;border:1px solid var(--bd);background:var(--card);box-shadow:var(--sh);cursor:pointer;font-size:18px';
-  g.onclick=settings;document.body.appendChild(g);
+  g.onclick=setup;document.body.appendChild(g);
 });
 })();
 </script>
